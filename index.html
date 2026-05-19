@@ -498,11 +498,6 @@ function renderEstatus(){
     <tbody>${p.items.map(it=>`<tr><td>${it.descripcion}</td><td class="r" style="font-weight:500">${it.cantidad}</td><td class="r" style="color:#94a3b8">${it.unidad}</td></tr>`).join('')}</tbody></table>
     ${p.nota?`<div class="info-alert" style="margin-top:14px">⚠️ <b>Nota del almacenista:</b> ${p.nota}</div>`:''}
     ${p.status==='listo'?`<div class="success-alert" style="margin-top:14px">✅ Tu material está listo. Por favor pasa a ventanilla a recogerlo.</div>`:''}
-    <div style="margin-top:16px;padding-top:16px;border-top:1px solid #f1f5f9">
-      <button onclick="printPDF(${p.folio})" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#0D2B55;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit">
-        🖨️ Imprimir / Descargar PDF
-      </button>
-    </div>
   </div>`;
 }
 
