@@ -2,13 +2,13 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Almacén Zubex — Vales de Salida</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f4fa;min-height:100vh;overflow-x:hidden}
-:root{--navy:#0D2B55;--navy-mid:#1a4f7a;--accent:#2563EB;--gray:#64748b;--border:#e2e8f0}
-/* SIDEBAR */
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f4fa;min-height:100vh}
+:root{--navy:#0D2B55;--accent:#2563EB;--gray:#64748b;--border:#e2e8f0}
 #sidebar{position:fixed;top:0;left:0;bottom:0;width:220px;background:var(--navy);display:flex;flex-direction:column;z-index:100;box-shadow:2px 0 12px rgba(13,43,85,.18)}
 .sb-logo{padding:24px 20px 18px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px}
 .sb-zx{width:36px;height:36px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;color:#fff;letter-spacing:-1px;flex-shrink:0}
@@ -20,33 +20,27 @@ nav{padding:14px 10px;flex:1}
 .nav-btn.active{background:rgba(37,99,235,.28);color:#93b8ff}
 .nav-badge{margin-left:auto;background:var(--accent);color:#fff;border-radius:10px;font-size:11px;padding:1px 7px;font-weight:600}
 .sb-footer{padding:14px 20px;border-top:1px solid rgba(255,255,255,.08);font-size:11px;color:rgba(255,255,255,.28)}
-/* WATERMARK */
 #watermark{position:fixed;top:50%;left:calc(50% + 110px);transform:translate(-50%,-50%);font-size:300px;font-weight:900;color:#0D2B55;opacity:.04;pointer-events:none;user-select:none;z-index:0;line-height:1;letter-spacing:-.05em}
-/* MAIN */
 #main{margin-left:220px;padding:32px;position:relative;z-index:1}
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
 .topbar h1{font-size:22px;font-weight:600;color:var(--navy)}
 .topbar p{font-size:13px;color:var(--gray);margin-top:4px}
-/* VIEWS */
-.view{display:none}
-.view.active{display:block}
-/* CARDS */
+.view{display:none}.view.active{display:block}
 .card{background:#fff;border-radius:12px;padding:24px;box-shadow:0 1px 3px rgba(13,43,85,.08);margin-bottom:20px}
 .card-title{font-size:15px;font-weight:600;color:var(--navy);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9}
-/* GRID */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
-/* METRIC CARDS */
-.metric{background:#fff;border-radius:12px;padding:20px 22px;box-shadow:0 1px 3px rgba(13,43,85,.08)}
-.metric-icon{font-size:24px;margin-bottom:6px}
-.metric-num{font-size:32px;font-weight:700}
-.metric-label{font-size:13px;color:var(--gray);margin-top:2px}
-/* FORM */
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:28px}
+.metric{background:#fff;border-radius:12px;padding:18px 20px;box-shadow:0 1px 3px rgba(13,43,85,.08);cursor:pointer;transition:transform .15s,box-shadow .15s}
+.metric:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(13,43,85,.12)}
+.metric.selected{outline:2px solid var(--accent)}
+.metric-icon{font-size:22px;margin-bottom:6px}
+.metric-num{font-size:30px;font-weight:700}
+.metric-label{font-size:12px;color:var(--gray);margin-top:2px}
 label.fl{font-size:12px;color:var(--gray);display:block;margin-bottom:5px;font-weight:500}
 input,select,textarea{border-radius:8px;border:1px solid var(--border);padding:9px 12px;font-size:14px;font-family:inherit;width:100%;background:#fff;outline:none;transition:border .15s}
 input:focus,select:focus{border-color:var(--accent)}
-/* ITEM ROWS */
 .item-row{display:grid;grid-template-columns:130px 1fr 80px 75px 36px;gap:8px;align-items:start;margin-bottom:8px}
 .item-header{display:grid;grid-template-columns:130px 1fr 80px 75px 36px;gap:8px;margin-bottom:8px}
 .item-header span{font-size:12px;color:#94a3b8;font-weight:500}
@@ -59,7 +53,6 @@ input:focus,select:focus{border-color:var(--accent)}
 .drop-item b{font-size:13px;color:#1e293b;font-weight:400}
 .stock-ok{font-size:11px;color:#16a34a;font-weight:500}
 .stock-no{font-size:11px;color:#dc2626;font-weight:500}
-/* BUTTONS */
 .btn{padding:9px 18px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:500;transition:opacity .15s}
 .btn:hover{opacity:.88}
 .btn-navy{background:var(--navy);color:#fff}
@@ -67,10 +60,9 @@ input:focus,select:focus{border-color:var(--accent)}
 .btn-outline{background:transparent;border:1px dashed #cbd5e1;color:var(--gray)}
 .btn-danger{background:none;border:1px solid #fee2e2;color:#ef4444;width:36px;height:36px;border-radius:8px;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:inherit}
 .btn-full{width:100%;padding:15px;font-size:15px;border-radius:12px}
-/* STATUS BADGES */
-.badge{font-size:12px;padding:4px 12px;border-radius:20px;font-weight:600;border:1px solid;white-space:nowrap}
+.btn-sm{padding:5px 12px;font-size:12px;border-radius:20px;border:1px solid;background:transparent;cursor:pointer;font-family:inherit}
+.badge{font-size:12px;padding:4px 12px;border-radius:20px;font-weight:600;border:1px solid;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
 .pill-btn{padding:5px 12px;border-radius:20px;border:1px solid;background:transparent;cursor:pointer;font-size:12px;font-family:inherit;transition:all .15s}
-/* STATUS COLORS */
 .s-recibido{background:#EAF3FB;color:#1a4f7a;border-color:#a8cce8}
 .s-surtiendo{background:#FEF3DC;color:#7a4a00;border-color:#f0c060}
 .s-listo{background:#E8F5E9;color:#2e6e35;border-color:#88c98f}
@@ -81,29 +73,22 @@ input:focus,select:focus{border-color:var(--accent)}
 .border-l-listo{border-left:4px solid #88c98f}
 .border-l-sinstock{border-left:4px solid #e88888}
 .border-l-parcial{border-left:4px solid #c088e0}
-/* TABLE */
 table{width:100%;border-collapse:collapse}
 th{text-align:left;padding:7px 10px;font-size:12px;color:#94a3b8;font-weight:500;background:#f8fafc}
-th:last-child,td:last-child{text-align:right}
+th.r,td.r{text-align:right}
 td{padding:7px 10px;font-size:13px;color:#334155;border-bottom:1px solid #f8fafc}
-/* QUEUE ROW */
 .q-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f1f5f9;font-size:13px}
-/* HOW IT WORKS */
 .step{display:flex;gap:14px;margin-bottom:14px;align-items:flex-start}
 .step-num{width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
 .step-t{font-size:14px;font-weight:500;color:#1e293b;margin:0}
 .step-d{font-size:12px;color:var(--gray);margin:2px 0 0}
-/* FOLIO BANNER */
 .folio-banner{border-radius:12px;padding:24px 28px;margin-bottom:20px;border:1.5px solid}
 .folio-num{font-size:40px;font-weight:700;line-height:1}
-/* TOAST */
 #toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.1);display:none;border:1px solid}
 .toast-ok{background:#f0fdf4;border-color:#86efac;color:#15803d}
 .toast-err{background:#fef2f2;border-color:#fca5a5;color:#dc2626}
-/* EMPTY STATE */
-.empty{text-align:center;padding:56px 24px;color:#94a3b8}
-.empty-icon{font-size:48px;margin-bottom:12px}
-/* MISC */
+.empty{text-align:center;padding:48px 24px;color:#94a3b8}
+.empty-icon{font-size:40px;margin-bottom:10px}
 .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;margin-left:6px}
 .tag-gray{background:#f1f5f9;color:#64748b}
 .tag-indigo{background:#eef2ff;color:#3730a3}
@@ -112,10 +97,31 @@ td{padding:7px 10px;font-size:13px;color:#334155;border-bottom:1px solid #f8fafc
 .nota-input-row input{flex:1}
 .info-alert{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 16px;font-size:14px;color:#92400e;margin-bottom:16px}
 .success-alert{background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:20px;text-align:center;font-size:15px;font-weight:600;color:#15803d}
+/* FILTER TABS */
+.filter-bar{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.ftab{padding:6px 16px;border-radius:20px;border:1px solid var(--border);background:#fff;font-size:13px;cursor:pointer;font-family:inherit;color:var(--gray);transition:all .15s}
+.ftab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+/* REGISTRO EXCEL TABLE */
+.reg-table-wrap{overflow-x:auto}
+.reg-table{width:100%;border-collapse:collapse;font-size:12px;min-width:900px}
+.reg-table th{background:#0D2B55;color:#fff;padding:8px 10px;text-align:left;font-weight:500;white-space:nowrap}
+.reg-table td{padding:7px 10px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+.reg-table tr:hover td{background:#f8fafc}
+.sap-ok{color:#15803d;font-weight:600}
+.sap-pending{color:#94a3b8}
+/* MODAL */
+#modal-overlay{display:none;position:fixed;inset:0;background:rgba(13,43,85,.55);z-index:500;align-items:center;justify-content:center}
+/* PDF PRINT */
+@media print{
+  #sidebar,#main .topbar,#main .filter-bar,.card-actions,#toast,#modal-overlay,#modal-sap,#watermark{display:none!important}
+  #main{margin:0;padding:0}
+  .view{display:none!important}
+  #pdf-frame{display:block!important}
+}
+#pdf-frame{display:none}
 </style>
 </head>
 <body>
-
 <div id="watermark">ZX</div>
 
 <!-- SIDEBAR -->
@@ -129,28 +135,29 @@ td{padding:7px 10px;font-size:13px;color:#334155;border-bottom:1px solid #f8fafc
     <button class="nav-btn" data-view="nuevo">📋 &nbsp;Nuevo vale</button>
     <button class="nav-btn" data-view="estatus">🔍 &nbsp;Mi pedido</button>
     <button class="nav-btn" data-view="almacen" onclick="checkAlmacen(event)">🔧 &nbsp;Almacenista <span class="nav-badge" id="badge-pending" style="display:none">0</span></button>
+    <button class="nav-btn" data-view="registro" onclick="checkRegistro(event)">📊 &nbsp;Registro SAP</button>
   </nav>
   <div class="sb-footer">Sistema de gestión v1.0</div>
 </div>
 
 <!-- MAIN -->
 <div id="main">
-  <!-- TOPBAR -->
   <div class="topbar">
-    <div>
-      <h1 id="page-title">Inicio</h1>
-      <p id="page-date"></p>
+    <div><h1 id="page-title">Inicio</h1><p id="page-date"></p></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-accent" id="btn-enviar" style="display:none" onclick="submitPedido()">Enviar pedido →</button>
+      <button class="btn btn-navy" id="btn-excel" style="display:none" onclick="exportExcel()">⬇ Exportar Excel</button>
     </div>
-    <button class="btn btn-accent" id="btn-enviar" style="display:none" onclick="submitPedido()">Enviar pedido →</button>
   </div>
 
   <!-- PORTAL -->
   <div class="view active" id="view-portal">
-    <div class="g4" id="metrics">
-      <div class="metric" style="border-top:4px solid #a8cce8"><div class="metric-icon">📥</div><div class="metric-num s-recibido" style="border:none;background:none;padding:0" id="cnt-recibido">0</div><div class="metric-label">Recibidos</div></div>
-      <div class="metric" style="border-top:4px solid #f0c060"><div class="metric-icon">⚙️</div><div class="metric-num s-surtiendo" style="border:none;background:none;padding:0" id="cnt-surtiendo">0</div><div class="metric-label">En proceso</div></div>
-      <div class="metric" style="border-top:4px solid #88c98f"><div class="metric-icon">✅</div><div class="metric-num s-listo" style="border:none;background:none;padding:0" id="cnt-listo">0</div><div class="metric-label">Listos</div></div>
-      <div class="metric" style="border-top:4px solid #e88888"><div class="metric-icon">❌</div><div class="metric-num s-sinstock" style="border:none;background:none;padding:0" id="cnt-sinstock">0</div><div class="metric-label">Sin stock</div></div>
+    <div class="g5" id="metrics">
+      <div class="metric" style="border-top:4px solid #a8cce8" onclick="goViewFilter('almacen','recibido')"><div class="metric-icon">📥</div><div class="metric-num" style="color:#1a4f7a" id="cnt-recibido">0</div><div class="metric-label">Recibidos</div></div>
+      <div class="metric" style="border-top:4px solid #f0c060" onclick="goViewFilter('almacen','surtiendo')"><div class="metric-icon">⚙️</div><div class="metric-num" style="color:#7a4a00" id="cnt-surtiendo">0</div><div class="metric-label">En proceso</div></div>
+      <div class="metric" style="border-top:4px solid #88c98f" onclick="goViewFilter('almacen','listo')"><div class="metric-icon">✅</div><div class="metric-num" style="color:#2e6e35" id="cnt-listo">0</div><div class="metric-label">Listos</div></div>
+      <div class="metric" style="border-top:4px solid #e88888" onclick="goViewFilter('almacen','sinstock')"><div class="metric-icon">❌</div><div class="metric-num" style="color:#8b1a1a" id="cnt-sinstock">0</div><div class="metric-label">Sin stock</div></div>
+      <div class="metric" style="border-top:4px solid #c088e0" onclick="goViewFilter('almacen','parcial')"><div class="metric-icon">⚠️</div><div class="metric-num" style="color:#5e2e7a" id="cnt-parcial">0</div><div class="metric-label">Parciales</div></div>
     </div>
     <div class="g2">
       <div class="card">
@@ -177,15 +184,9 @@ td{padding:7px 10px;font-size:13px;color:#334155;border-bottom:1px solid #f8fafc
         <div><label class="fl">Departamento *</label><input id="f-dep" placeholder="Ej. Mantenimiento"></div>
       </div>
       <div class="g3">
-        <div><label class="fl">Área</label>
-          <select id="f-area"><option value="">Seleccionar</option><option>Producción</option><option>Mantenimiento</option><option>Almacén</option><option>Calidad</option><option>Administración</option><option>Logística</option></select>
-        </div>
-        <div><label class="fl">Línea</label>
-          <select id="f-linea"><option value="">Seleccionar</option><option>Línea 1</option><option>Línea 2</option><option>Línea 3</option><option>Línea 4</option><option>General</option></select>
-        </div>
-        <div><label class="fl">Tipo de gasto</label>
-          <select id="f-tipo"><option>MCR</option><option>MPR</option><option>ME</option><option>SGE</option><option>OPE</option><option>NIN</option><option>MOD</option><option>PROY</option></select>
-        </div>
+        <div><label class="fl">Área</label><select id="f-area"><option value="">Seleccionar</option><option>Producción</option><option>Mantenimiento</option><option>Almacén</option><option>Calidad</option><option>Administración</option><option>Logística</option></select></div>
+        <div><label class="fl">Línea</label><select id="f-linea"><option value="">Seleccionar</option><option>Línea 1</option><option>Línea 2</option><option>Línea 3</option><option>Línea 4</option><option>General</option></select></div>
+        <div><label class="fl">Tipo de gasto</label><select id="f-tipo"><option>MCR</option><option>MPR</option><option>ME</option><option>SGE</option><option>OPE</option><option>NIN</option><option>MOD</option><option>PROY</option></select></div>
       </div>
     </div>
     <div class="card">
@@ -197,29 +198,72 @@ td{padding:7px 10px;font-size:13px;color:#334155;border-bottom:1px solid #f8fafc
   </div>
 
   <!-- MI PEDIDO -->
-  <div class="view" id="view-estatus">
-    <div id="estatus-content"></div>
-  </div>
+  <div class="view" id="view-estatus"><div id="estatus-content"></div></div>
 
   <!-- ALMACENISTA -->
   <div class="view" id="view-almacen">
-    <input id="alm-search" placeholder="🔍  Buscar por folio, nombre o departamento…" style="margin-bottom:20px" oninput="renderAlmacen()">
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+      <input id="alm-search" placeholder="🔍  Buscar por folio, nombre o departamento…" style="flex:1;min-width:200px" oninput="renderAlmacen()">
+    </div>
+    <div class="filter-bar" id="alm-filters">
+      <button class="ftab active" data-filter="todos" onclick="setFilter('todos',this)">Todos</button>
+      <button class="ftab" data-filter="recibido" onclick="setFilter('recibido',this)">⏳ Recibidos</button>
+      <button class="ftab" data-filter="surtiendo" onclick="setFilter('surtiendo',this)">🔄 Surtiéndose</button>
+      <button class="ftab" data-filter="listo" onclick="setFilter('listo',this)">✅ Listos</button>
+      <button class="ftab" data-filter="sinstock" onclick="setFilter('sinstock',this)">❌ Sin stock</button>
+      <button class="ftab" data-filter="parcial" onclick="setFilter('parcial',this)">⚠️ Parciales</button>
+    </div>
     <div id="almacen-list"></div>
+  </div>
+
+  <!-- REGISTRO SAP -->
+  <div class="view" id="view-registro">
+    <div class="card">
+      <p class="card-title">Registro de vales — Control SAP</p>
+      <div class="reg-table-wrap">
+        <table class="reg-table" id="reg-table">
+          <thead><tr>
+            <th>#</th><th>Folio</th><th>Fecha</th><th>Solicitante</th><th>Depto.</th><th>Área</th><th>Tipo</th><th>Artículos</th><th>Estatus</th><th>Capturado SAP</th><th>Quién capturó</th>
+          </tr></thead>
+          <tbody id="reg-tbody"><tr><td colspan="11" style="text-align:center;color:#94a3b8;padding:32px">Sin vales registrados aún</td></tr></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- MODAL CONTRASEÑA -->
-<div id="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(13,43,85,0.55);z-index:500;align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:16px;padding:36px 32px;width:340px;box-shadow:0 20px 48px rgba(13,43,85,0.22);text-align:center">
-    <div style="width:52px;height:52px;border-radius:12px;background:#0D2B55;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#fff;letter-spacing:-1px;margin:0 auto 18px">ZX</div>
+<div id="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(13,43,85,.55);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:16px;padding:36px 32px;width:340px;box-shadow:0 20px 48px rgba(13,43,85,.22);text-align:center">
+    <div style="width:52px;height:52px;border-radius:12px;background:#0D2B55;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#fff;margin:0 auto 18px">ZX</div>
     <h2 style="font-size:17px;font-weight:600;color:#0D2B55;margin-bottom:6px">Acceso restringido</h2>
-    <p style="font-size:13px;color:#64748b;margin-bottom:20px">Ingresa la contraseña de almacenista para continuar</p>
+    <p style="font-size:13px;color:#64748b;margin-bottom:20px">Ingresa la contraseña de almacenista</p>
     <input type="password" id="pwd-input" placeholder="Contraseña" style="margin-bottom:10px;text-align:center;letter-spacing:2px" onkeydown="if(event.key==='Enter')verifyPwd()">
-    <p id="pwd-error" style="color:#dc2626;font-size:12px;margin-bottom:10px;display:none">Contraseña incorrecta. Intenta de nuevo.</p>
-    <button class="btn btn-navy" style="width:100%;padding:11px;border-radius:8px;font-size:14px" onclick="verifyPwd()">Ingresar</button>
-    <button class="btn" style="width:100%;margin-top:8px;padding:9px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;color:#64748b;background:transparent" onclick="closeModal()">Cancelar</button>
+    <p id="pwd-error" style="color:#dc2626;font-size:12px;margin-bottom:10px;display:none">Contraseña incorrecta.</p>
+    <button class="btn btn-navy" style="width:100%;padding:11px" onclick="verifyPwd()">Ingresar</button>
+    <button class="btn" style="width:100%;margin-top:8px;padding:9px;border:1px solid #e2e8f0;background:transparent;color:#64748b" onclick="closeModal()">Cancelar</button>
   </div>
 </div>
+
+<!-- MODAL SAP -->
+<div id="modal-sap" style="display:none;position:fixed;inset:0;background:rgba(13,43,85,.55);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:16px;padding:32px;width:380px;box-shadow:0 20px 48px rgba(13,43,85,.22)">
+    <h2 style="font-size:16px;font-weight:600;color:#0D2B55;margin-bottom:6px">Registrar captura en SAP</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:18px">Folio: <b id="sap-folio-label"></b></p>
+    <div style="margin-bottom:14px"><label class="fl">¿Capturado en SAP?</label>
+      <select id="sap-status-sel"><option value="OK">✅ OK — Capturado</option><option value="">Pendiente</option></select>
+    </div>
+    <div style="margin-bottom:20px"><label class="fl">Quién capturó en SAP</label>
+      <input id="sap-quien" placeholder="Nombre del capturista"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-navy" style="flex:1" onclick="saveSap()">Guardar</button>
+      <button class="btn" style="flex:1;border:1px solid #e2e8f0;background:transparent;color:#64748b" onclick="document.getElementById('modal-sap').style.display='none'">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- PDF FRAME (hidden, solo print) -->
+<div id="pdf-frame"></div>
 
 <!-- TOAST -->
 <div id="toast"></div>
@@ -298,87 +342,116 @@ const STATUS={
   parcial:{label:"Surtido parcial",cls:"s-parcial",icon:"⚠️"},
 };
 
-let pedidos=[], myFolio=null, nextFolio=36809, itemCount=0;
-const titles={portal:"Inicio",nuevo:"Nuevo vale",estatus:"Mi pedido",almacen:"Almacenista"};
+const TITLES={portal:"Inicio",nuevo:"Nuevo vale",estatus:"Mi pedido",almacen:"Almacenista",registro:"Registro SAP"};
+let pedidos=[],myFolio=null,nextFolio=36809,itemCount=0,almacenAuth=false,currentFilter='todos',currentSapFolio=null;
+const PWD='AlmacenZX2026ERP';
 
-function goView(v){
-  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('view-'+v).classList.add('active');
-  document.querySelector('[data-view="'+v+'"]').classList.add('active');
-  document.getElementById('page-title').textContent=titles[v];
-  document.getElementById('btn-enviar').style.display=v==='nuevo'?'':'none';
-  if(v==='estatus') renderEstatus();
-  if(v==='almacen') renderAlmacen();
-  if(v==='portal') renderPortal();
-}
-
-document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>goView(b.dataset.view)));
-
-// Date
+// DATE
 const days=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 const months=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const now=new Date();
 document.getElementById('page-date').textContent=days[now.getDay()]+', '+now.getDate()+' de '+months[now.getMonth()]+' de '+now.getFullYear();
 
-// ITEMS
+// NAV
+function goView(v){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  const nb=document.querySelector('[data-view="'+v+'"]');
+  if(nb) nb.classList.add('active');
+  document.getElementById('page-title').textContent=TITLES[v];
+  document.getElementById('btn-enviar').style.display=v==='nuevo'?'':'none';
+  document.getElementById('btn-excel').style.display=v==='registro'?'':'none';
+  if(v==='estatus') renderEstatus();
+  if(v==='almacen') renderAlmacen();
+  if(v==='portal') renderPortal();
+  if(v==='registro') renderRegistro();
+}
+
+function goViewFilter(v,filter){
+  if(!almacenAuth){checkAlmacen({preventDefault:()=>{}});return;}
+  currentFilter=filter;
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  const tab=document.querySelector('[data-filter="'+filter+'"]');
+  if(tab) tab.classList.add('active');
+  goView(v);
+}
+
+function setFilter(f,el){
+  currentFilter=f;
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderAlmacen();
+}
+
+// AUTH
+function checkAlmacen(e){
+  if(e&&e.preventDefault) e.preventDefault();
+  if(almacenAuth){goView('almacen');return;}
+  document.getElementById('modal-overlay').style.display='flex';
+  document.getElementById('pwd-input').value='';
+  document.getElementById('pwd-error').style.display='none';
+  setTimeout(()=>document.getElementById('pwd-input').focus(),100);
+}
+function checkRegistro(e){
+  if(e&&e.preventDefault) e.preventDefault();
+  if(almacenAuth){goView('registro');return;}
+  document.getElementById('modal-overlay').style.display='flex';
+  document.getElementById('pwd-input').value='';
+  document.getElementById('pwd-error').style.display='none';
+  setTimeout(()=>document.getElementById('pwd-input').focus(),100);
+}
+function verifyPwd(){
+  if(document.getElementById('pwd-input').value===PWD){almacenAuth=true;closeModal();goView('almacen');}
+  else{document.getElementById('pwd-error').style.display='block';document.getElementById('pwd-input').value='';document.getElementById('pwd-input').focus();}
+}
+function closeModal(){document.getElementById('modal-overlay').style.display='none';}
+
+document.querySelectorAll('.nav-btn').forEach(b=>{
+  if(b.dataset.view==='almacen'||b.dataset.view==='registro') return;
+  b.addEventListener('click',()=>goView(b.dataset.view));
+});
+
+// ITEM ROWS
 function addItemRow(){
   const idx=itemCount++;
   const row=document.createElement('div');
-  row.className='item-row';
-  row.id='item-row-'+idx;
-  row.innerHTML=`
-    <input placeholder="Código" id="ic-${idx}" oninput="syncDesc(${idx})">
-    <div class="rel">
-      <input placeholder="Buscar artículo..." id="id-${idx}" oninput="filterDrop(${idx})" onfocus="openDrop(${idx})">
-      <div class="dropdown" id="dd-${idx}"></div>
-    </div>
+  row.className='item-row';row.id='item-row-'+idx;
+  row.innerHTML=`<input placeholder="Código" id="ic-${idx}" oninput="syncDesc(${idx})">
+    <div class="rel"><input placeholder="Buscar artículo..." id="id-${idx}" oninput="filterDrop(${idx})" onfocus="openDrop(${idx})">
+    <div class="dropdown" id="dd-${idx}"></div></div>
     <input type="number" min="0" placeholder="0" id="iq-${idx}">
     <select id="iu-${idx}"><option>pza</option><option>mts</option><option>kg</option><option>lts</option><option>rollo</option><option>caja</option><option>par</option></select>
     <button class="btn-danger" onclick="removeRow(${idx})">×</button>`;
   document.getElementById('items-container').appendChild(row);
   document.getElementById('id-'+idx).addEventListener('blur',()=>setTimeout(()=>closeDrop(idx),150));
 }
-
-function syncDesc(idx){
-  const code=document.getElementById('ic-'+idx).value;
-  const found=ITEMS.find(x=>x.id.toLowerCase()===code.toLowerCase());
-  if(found) document.getElementById('id-'+idx).value=found.desc;
-}
-
-function openDrop(idx){
-  const q=document.getElementById('id-'+idx).value;
-  if(q.length>=1) filterDrop(idx);
-}
-
+function syncDesc(idx){const c=document.getElementById('ic-'+idx).value;const f=ITEMS.find(x=>x.id.toLowerCase()===c.toLowerCase());if(f)document.getElementById('id-'+idx).value=f.desc;}
+function openDrop(idx){if(document.getElementById('id-'+idx).value.length>=1)filterDrop(idx);}
 function filterDrop(idx){
   const q=document.getElementById('id-'+idx).value.toLowerCase();
   const dd=document.getElementById('dd-'+idx);
   if(q.length<1){dd.classList.remove('open');return;}
-  const matches=ITEMS.filter(x=>x.id.toLowerCase().includes(q)||x.desc.toLowerCase().includes(q)).slice(0,8);
-  if(!matches.length){dd.classList.remove('open');return;}
-  dd.innerHTML=matches.map(m=>`<div class="drop-item" onmousedown="selectItem(${idx},'${m.id}','${m.desc.replace(/'/g,"\\'")}',${m.qty})"><span>${m.id}</span><b>${m.desc}</b> <span class="${m.qty>0?'stock-ok':'stock-no'}">● Stock: ${m.qty}</span></div>`).join('');
+  const m=ITEMS.filter(x=>x.id.toLowerCase().includes(q)||x.desc.toLowerCase().includes(q)).slice(0,8);
+  if(!m.length){dd.classList.remove('open');return;}
+  dd.innerHTML=m.map(i=>`<div class="drop-item" onmousedown="selectItem(${idx},'${i.id}','${i.desc.replace(/'/g,"\\'")}',${i.qty})"><span>${i.id}</span><b>${i.desc}</b> <span class="${i.qty>0?'stock-ok':'stock-no'}">● Stock: ${i.qty}</span></div>`).join('');
   dd.classList.add('open');
 }
-
-function selectItem(idx,id,desc,qty){
+function selectItem(idx,id,desc){
   document.getElementById('ic-'+idx).value=id;
   document.getElementById('id-'+idx).value=desc;
   closeDrop(idx);
 }
-
-function closeDrop(idx){document.getElementById('dd-'+idx)&&document.getElementById('dd-'+idx).classList.remove('open');}
-
+function closeDrop(idx){const d=document.getElementById('dd-'+idx);if(d)d.classList.remove('open');}
 function removeRow(idx){const r=document.getElementById('item-row-'+idx);if(r)r.remove();}
-
 function getItems(){
-  const rows=document.querySelectorAll('[id^="item-row-"]');
-  return Array.from(rows).map(r=>{
+  return Array.from(document.querySelectorAll('[id^="item-row-"]')).map(r=>{
     const i=r.id.replace('item-row-','');
     return{codigo:document.getElementById('ic-'+i).value,descripcion:document.getElementById('id-'+i).value,cantidad:document.getElementById('iq-'+i).value,unidad:document.getElementById('iu-'+i).value};
   }).filter(x=>x.descripcion&&x.cantidad);
 }
 
+// SUBMIT
 function submitPedido(){
   const sol=document.getElementById('f-sol').value.trim();
   const dep=document.getElementById('f-dep').value.trim();
@@ -386,23 +459,18 @@ function submitPedido(){
   const items=getItems();
   if(!items.length){showToast('Agrega al menos un artículo','err');return;}
   const folio=nextFolio++;
-  pedidos.unshift({folio,fecha:new Date().toLocaleString('es-MX'),solicitante:sol,departamento:dep,area:document.getElementById('f-area').value,linea:document.getElementById('f-linea').value,tipoGasto:document.getElementById('f-tipo').value,items,status:'recibido',nota:''});
+  pedidos.unshift({folio,fecha:new Date().toLocaleString('es-MX'),solicitante:sol,departamento:dep,area:document.getElementById('f-area').value,linea:document.getElementById('f-linea').value,tipoGasto:document.getElementById('f-tipo').value,items,status:'recibido',nota:'',sapStatus:'',sapQuien:''});
   myFolio=folio;
-  document.getElementById('f-sol').value='';
-  document.getElementById('f-dep').value='';
-  document.getElementById('items-container').innerHTML='';
-  itemCount=0;
-  addItemRow();
-  updateBadge();
-  showToast('Vale #'+folio+' enviado correctamente','ok');
-  goView('estatus');
+  document.getElementById('f-sol').value='';document.getElementById('f-dep').value='';
+  document.getElementById('items-container').innerHTML='';itemCount=0;addItemRow();
+  updateBadge();showToast('Vale #'+folio+' enviado correctamente','ok');goView('estatus');
 }
 
 // PORTAL
 function renderPortal(){
   const cnt={recibido:0,surtiendo:0,listo:0,sinstock:0,parcial:0};
-  pedidos.forEach(p=>cnt[p.status]=(cnt[p.status]||0)+1);
-  ['recibido','surtiendo','listo','sinstock'].forEach(s=>{document.getElementById('cnt-'+s).textContent=cnt[s]||0;});
+  pedidos.forEach(p=>{cnt[p.status]=(cnt[p.status]||0)+1;});
+  Object.keys(cnt).forEach(s=>{const el=document.getElementById('cnt-'+s);if(el)el.textContent=cnt[s]||0;});
   const active=pedidos.filter(p=>p.status==='recibido'||p.status==='surtiendo').slice(0,6);
   const q=document.getElementById('portal-queue');
   if(!active.length){q.innerHTML='<div class="empty" style="padding:24px 0"><div class="empty-icon">📭</div><p>Sin pedidos activos</p></div>';return;}
@@ -415,33 +483,36 @@ function renderEstatus(){
   const p=pedidos.find(x=>x.folio===myFolio);
   if(!p){c.innerHTML=`<div class="card empty"><div class="empty-icon">📋</div><p>No tienes un pedido activo en esta sesión.</p><br><button class="btn btn-navy" onclick="goView('nuevo')">Crear nuevo vale</button></div>`;return;}
   const s=STATUS[p.status];
-  const scls=p.status;
-  c.innerHTML=`
-    <div class="folio-banner s-${scls}" style="border-color:currentColor">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div><p style="font-size:13px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Folio</p><div class="folio-num">#${p.folio}</div><p style="font-size:13px;opacity:.7;margin-top:8px">${p.fecha}</p></div>
-        <div style="text-align:right"><div style="font-size:48px">${s.icon}</div><div style="font-size:15px;font-weight:600;margin-top:4px">${s.label}</div></div>
-      </div>
+  c.innerHTML=`<div class="folio-banner s-${p.status}" style="border-color:currentColor">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div><p style="font-size:13px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Folio</p><div class="folio-num">#${p.folio}</div><p style="font-size:13px;opacity:.7;margin-top:8px">${p.fecha}</p></div>
+      <div style="text-align:right"><div style="font-size:48px">${s.icon}</div><div style="font-size:15px;font-weight:600;margin-top:4px">${s.label}</div></div>
+    </div></div>
+  <div class="card">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #f1f5f9">
+      <div><p style="font-size:12px;color:#94a3b8;font-weight:500">Solicitante</p><p style="font-size:15px;font-weight:500;color:#1e293b;margin-top:4px">${p.solicitante}</p></div>
+      <div><p style="font-size:12px;color:#94a3b8;font-weight:500">Departamento</p><p style="font-size:15px;font-weight:500;color:#1e293b;margin-top:4px">${p.departamento}</p></div>
+      <div><p style="font-size:12px;color:#94a3b8;font-weight:500">Tipo de gasto</p><p style="font-size:15px;font-weight:500;color:#1e293b;margin-top:4px">${p.tipoGasto}</p></div>
     </div>
-    <div class="card">
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #f1f5f9">
-        <div><p style="font-size:12px;color:#94a3b8;font-weight:500">Solicitante</p><p style="font-size:15px;font-weight:500;color:#1e293b;margin-top:4px">${p.solicitante}</p></div>
-        <div><p style="font-size:12px;color:#94a3b8;font-weight:500">Departamento</p><p style="font-size:15px;font-weight:500;color:#1e293b;margin-top:4px">${p.departamento}</p></div>
-        <div><p style="font-size:12px;color:#94a3b8;font-weight:500">Tipo de gasto</p><p style="font-size:15px;font-weight:500;color:#1e293b;margin-top:4px">${p.tipoGasto}</p></div>
-      </div>
-      <table><thead><tr><th>Artículo</th><th style="text-align:right">Cant.</th><th style="text-align:right">Unidad</th></tr></thead>
-      <tbody>${p.items.map(it=>`<tr><td>${it.descripcion}</td><td style="text-align:right;font-weight:500">${it.cantidad}</td><td style="text-align:right;color:#94a3b8">${it.unidad}</td></tr>`).join('')}</tbody></table>
-      ${p.nota?`<div class="info-alert" style="margin-top:14px">⚠️ <b>Nota del almacenista:</b> ${p.nota}</div>`:''}
-      ${p.status==='listo'?`<div class="success-alert" style="margin-top:14px">✅ Tu material está listo. Por favor pasa a ventanilla a recogerlo.</div>`:''}
-    </div>`;
+    <table><thead><tr><th>Artículo</th><th class="r">Cant.</th><th class="r">Unidad</th></tr></thead>
+    <tbody>${p.items.map(it=>`<tr><td>${it.descripcion}</td><td class="r" style="font-weight:500">${it.cantidad}</td><td class="r" style="color:#94a3b8">${it.unidad}</td></tr>`).join('')}</tbody></table>
+    ${p.nota?`<div class="info-alert" style="margin-top:14px">⚠️ <b>Nota del almacenista:</b> ${p.nota}</div>`:''}
+    ${p.status==='listo'?`<div class="success-alert" style="margin-top:14px">✅ Tu material está listo. Por favor pasa a ventanilla a recogerlo.</div>`:''}
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid #f1f5f9">
+      <button onclick="printPDF(${p.folio})" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#0D2B55;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit">
+        🖨️ Imprimir / Descargar PDF
+      </button>
+    </div>
+  </div>`;
 }
 
 // ALMACENISTA
 function renderAlmacen(){
   const q=(document.getElementById('alm-search').value||'').toLowerCase();
-  const filtered=pedidos.filter(p=>!q||p.folio.toString().includes(q)||p.solicitante.toLowerCase().includes(q)||p.departamento.toLowerCase().includes(q));
+  let filtered=pedidos.filter(p=>!q||p.folio.toString().includes(q)||p.solicitante.toLowerCase().includes(q)||p.departamento.toLowerCase().includes(q));
+  if(currentFilter!=='todos') filtered=filtered.filter(p=>p.status===currentFilter);
   const el=document.getElementById('almacen-list');
-  if(!filtered.length){el.innerHTML='<div class="card empty"><div class="empty-icon">📭</div><p>Sin pedidos aún. Los vales aparecerán aquí en tiempo real.</p></div>';return;}
+  if(!filtered.length){el.innerHTML='<div class="card empty"><div class="empty-icon">📭</div><p>No hay pedidos con este filtro.</p></div>';return;}
   el.innerHTML=filtered.map(p=>{
     const s=STATUS[p.status];
     return`<div class="card border-l-${p.status}" style="margin-bottom:16px">
@@ -454,14 +525,18 @@ function renderAlmacen(){
             <span class="tag tag-indigo">${p.tipoGasto}</span>
           </div>
         </div>
-        <span class="badge ${s.cls}">${s.icon} ${s.label}</span>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+          <span class="badge ${s.cls}">${s.icon} ${s.label}</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn-sm s-listo" onclick="printPDF(${p.folio})" title="Imprimir PDF">🖨️ PDF</button>
+            <button class="btn-sm tag-indigo" style="background:#eef2ff;border-color:#c7d2fe" onclick="openSapModal(${p.folio})">📋 SAP ${p.sapStatus?'<b style=color:#15803d>✓</b>':''}</button>
+          </div>
+        </div>
       </div>
-      <table style="margin-bottom:14px">
-        <thead><tr style="background:#f8fafc"><th>Artículo</th><th>Cant.</th><th>Unidad</th></tr></thead>
-        <tbody>${p.items.map(it=>`<tr><td>${it.descripcion}</td><td style="text-align:right;font-weight:500">${it.cantidad}</td><td style="text-align:right;color:#94a3b8">${it.unidad}</td></tr>`).join('')}</tbody>
-      </table>
+      <table style="margin-bottom:14px"><thead><tr style="background:#f8fafc"><th>Artículo</th><th>Cant.</th><th>Unidad</th></tr></thead>
+      <tbody>${p.items.map(it=>`<tr><td>${it.descripcion}</td><td class="r" style="font-weight:500">${it.cantidad}</td><td class="r" style="color:#94a3b8">${it.unidad}</td></tr>`).join('')}</tbody></table>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
-        ${Object.entries(STATUS).map(([st,cfg])=>`<button class="pill-btn ${cfg.cls}" style="${p.status===st?`font-weight:600`:''}" onclick="cambiarStatus(${p.folio},'${st}')">${cfg.icon} ${cfg.label}</button>`).join('')}
+        ${Object.entries(STATUS).map(([st,cfg])=>`<button class="pill-btn ${cfg.cls}" style="${p.status===st?'font-weight:600':''}" onclick="cambiarStatus(${p.folio},'${st}')">${cfg.icon} ${cfg.label}</button>`).join('')}
       </div>
       <div id="nota-area-${p.folio}">
         ${p.nota?`<div class="nota-box">📝 ${p.nota}</div>`:''}
@@ -475,20 +550,149 @@ function cambiarStatus(folio,status){
   const p=pedidos.find(x=>x.folio===folio);
   if(p){p.status=status;updateBadge();renderAlmacen();renderPortal();showToast('Folio #'+folio+': '+STATUS[status].label,'ok');}
 }
-
 function toggleNota(folio){
   const p=pedidos.find(x=>x.folio===folio);
-  const area=document.getElementById('nota-area-'+folio);
-  area.innerHTML=`<div class="nota-input-row">
+  document.getElementById('nota-area-'+folio).innerHTML=`<div class="nota-input-row">
     <input id="nota-input-${folio}" value="${p.nota||''}" placeholder="Nota para el operador…">
     <button class="btn btn-navy" style="padding:0 16px;white-space:nowrap" onclick="saveNota(${folio})">Guardar</button>
-    <button class="btn" style="padding:0 12px;border:1px solid var(--border)" onclick="renderAlmacen()">×</button>
+    <button class="btn" style="padding:0 12px;border:1px solid #e2e8f0;background:transparent" onclick="renderAlmacen()">×</button>
   </div>`;
 }
-
 function saveNota(folio){
   const p=pedidos.find(x=>x.folio===folio);
   if(p){p.nota=document.getElementById('nota-input-'+folio).value;renderAlmacen();showToast('Nota guardada','ok');}
+}
+
+// SAP MODAL
+function openSapModal(folio){
+  const p=pedidos.find(x=>x.folio===folio);
+  currentSapFolio=folio;
+  document.getElementById('sap-folio-label').textContent='#'+folio;
+  document.getElementById('sap-status-sel').value=p.sapStatus||'';
+  document.getElementById('sap-quien').value=p.sapQuien||'';
+  document.getElementById('modal-sap').style.display='flex';
+}
+function saveSap(){
+  const p=pedidos.find(x=>x.folio===currentSapFolio);
+  if(p){p.sapStatus=document.getElementById('sap-status-sel').value;p.sapQuien=document.getElementById('sap-quien').value;}
+  document.getElementById('modal-sap').style.display='none';
+  renderAlmacen();renderRegistro();showToast('Registro SAP actualizado','ok');
+}
+
+// REGISTRO
+function renderRegistro(){
+  const tbody=document.getElementById('reg-tbody');
+  if(!pedidos.length){tbody.innerHTML='<tr><td colspan="11" style="text-align:center;color:#94a3b8;padding:32px">Sin vales registrados aún</td></tr>';return;}
+  tbody.innerHTML=pedidos.map((p,i)=>`<tr>
+    <td>${i+1}</td>
+    <td><b>#${p.folio}</b></td>
+    <td style="white-space:nowrap">${p.fecha}</td>
+    <td>${p.solicitante}</td>
+    <td>${p.departamento}</td>
+    <td>${p.area||'—'}</td>
+    <td><span class="tag tag-indigo">${p.tipoGasto}</span></td>
+    <td style="max-width:200px;font-size:12px">${p.items.map(it=>it.descripcion).join(', ')}</td>
+    <td><span class="badge ${STATUS[p.status].cls}" style="font-size:11px">${STATUS[p.status].icon} ${STATUS[p.status].label}</span></td>
+    <td class="${p.sapStatus?'sap-ok':'sap-pending'}">${p.sapStatus||'Pendiente'}</td>
+    <td>${p.sapQuien||'—'}</td>
+  </tr>`).join('');
+}
+
+// EXCEL
+function exportExcel(){
+  const data=[['#','Folio','Fecha','Solicitante','Departamento','Área','Tipo Gasto','Artículos','Cantidad','Unidad','Estatus','Capturado SAP','Quién capturó']];
+  pedidos.forEach((p,i)=>{
+    if(p.items.length===0){data.push([i+1,p.folio,p.fecha,p.solicitante,p.departamento,p.area||'',p.tipoGasto,'','','',STATUS[p.status].label,p.sapStatus||'Pendiente',p.sapQuien||'']);}
+    p.items.forEach((it,j)=>{
+      data.push([j===0?i+1:'',j===0?p.folio:'',j===0?p.fecha:'',j===0?p.solicitante:'',j===0?p.departamento:'',j===0?(p.area||''):'',j===0?p.tipoGasto:'',it.descripcion,it.cantidad,it.unidad,j===0?STATUS[p.status].label:'',j===0?(p.sapStatus||'Pendiente'):'',j===0?(p.sapQuien||''):'']);
+    });
+  });
+  const ws=XLSX.utils.aoa_to_sheet(data);
+  ws['!cols']=[{wch:4},{wch:8},{wch:18},{wch:18},{wch:14},{wch:12},{wch:10},{wch:45},{wch:9},{wch:8},{wch:22},{wch:14},{wch:16}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Vales Almacén');
+  XLSX.writeFile(wb,'Vales_Almacen_Zubex_'+new Date().toISOString().slice(0,10)+'.xlsx');
+  showToast('Excel descargado','ok');
+}
+
+// PDF
+function printPDF(folio){
+  const p=pedidos.find(x=>x.folio===folio);
+  if(!p) return;
+  const tipos={MCR:0,MPR:1,ME:2,SGE:3,OPE:4,NIN:5,MOD:6,PROY:7};
+  const allTipos=['MCR','MPR','ME','SGE','OPE','NIN','MOD','PROY'];
+  const rows=Array.from({length:Math.max(10,p.items.length)},(_,i)=>{
+    const it=p.items[i]||{codigo:'',descripcion:'',cantidad:'',unidad:''};
+    return`<tr><td style="border:1px solid #1a3a8f;padding:3px 5px;font-size:11px">${it.codigo||''}</td><td style="border:1px solid #1a3a8f;padding:3px 5px;font-size:11px">${it.descripcion||''}</td><td style="border:1px solid #1a3a8f;padding:3px 5px;font-size:11px;text-align:center">${it.cantidad||''}</td><td style="border:1px solid #1a3a8f;padding:3px 5px;font-size:11px;text-align:center">${it.unidad||''}</td></tr>`;
+  }).join('');
+  const tipoBoxes=allTipos.map(t=>`<span style="display:inline-block;border:1px solid #1a3a8f;padding:1px 4px;font-size:9px;margin:1px;background:${p.tipoGasto===t?'#1a3a8f':'transparent'};color:${p.tipoGasto===t?'#fff':'#1a3a8f'}">${t}</span>`).join('');
+  const win=window.open('','_blank','width=700,height=600');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Vale #${p.folio}</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Arial,sans-serif;padding:16px;width:680px;color:#1a3a8f}
+    @media print{body{padding:8px;width:100%}button{display:none!important}}
+  </style></head><body>
+  <div style="border:2px solid #1a3a8f;padding:14px">
+    <!-- HEADER -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+      <div style="flex:1">
+        <div style="font-size:38px;font-weight:900;color:#1a3a8f;letter-spacing:-2px;line-height:1">zubex</div>
+        <div style="font-size:13px;font-weight:700;color:#1a3a8f;margin-top:4px;letter-spacing:1px">VALE DE SALIDA DE ALMACÉN</div>
+      </div>
+      <div style="text-align:right;font-size:9px;color:#1a3a8f;border:1px solid #1a3a8f;padding:6px;min-width:160px;background:#e8eef8">
+        <div style="font-weight:700;margin-bottom:2px">Sistema de Gestión de Inocuidad y Calidad</div>
+        <div>Formato: Vale De Salida De Almacen</div>
+        <div>Fecha de Revisión: 17 de octubre 2023</div>
+        <div>Clave: ALM-F-31</div>
+        <div>Revisión: 6</div>
+        <div style="margin-top:4px;font-size:8px">Página 1 de 1</div>
+      </div>
+    </div>
+    <!-- FOLIO -->
+    <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
+      <div style="text-align:right">
+        <span style="font-size:13px;font-weight:700">Folio: N<sup>o</sup> </span>
+        <span style="font-size:22px;font-weight:900;color:#cc2020">${p.folio}</span>
+      </div>
+    </div>
+    <!-- META ROW -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px;font-size:11px">
+      <div><span style="font-weight:700">Solicita: </span>${p.solicitante}</div>
+      <div><span style="font-weight:700">Departamento: </span>${p.departamento}</div>
+      <div><span style="font-weight:700">Área: </span>${p.area||'___________'}</div>
+      <div><span style="font-weight:700">Fecha: </span>${p.fecha.split(',')[0]}</div>
+    </div>
+    <div style="margin-bottom:8px;font-size:11px"><span style="font-weight:700">Línea: </span>${p.linea||'___________'}</div>
+    <!-- TIPO GASTO -->
+    <div style="margin-bottom:8px;font-size:10px">
+      <span style="font-weight:700;margin-right:4px">TIPO DE GASTO:</span>${tipoBoxes}
+    </div>
+    <!-- TABLE -->
+    <table style="width:100%;border-collapse:collapse;margin-bottom:14px">
+      <thead><tr style="background:#1a3a8f;color:#fff">
+        <th style="border:1px solid #1a3a8f;padding:4px 6px;font-size:11px;text-align:left;width:120px">Código</th>
+        <th style="border:1px solid #1a3a8f;padding:4px 6px;font-size:11px;text-align:left">Descripción</th>
+        <th style="border:1px solid #1a3a8f;padding:4px 6px;font-size:11px;text-align:center;width:70px">Cantidad</th>
+        <th style="border:1px solid #1a3a8f;padding:4px 6px;font-size:11px;text-align:center;width:70px">Unidad</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <!-- FIRMAS -->
+    <div style="display:flex;justify-content:space-between;margin-top:20px">
+      <div style="text-align:center;width:200px">
+        <div style="border-top:1px solid #1a3a8f;margin-top:30px;padding-top:4px;font-size:11px">Firma de Recibido</div>
+      </div>
+      <div style="text-align:center;width:200px">
+        <div style="border-top:1px solid #1a3a8f;margin-top:30px;padding-top:4px;font-size:11px">Almacenista</div>
+      </div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:12px">
+    <button onclick="window.print();window.close()" style="padding:10px 28px;background:#0D2B55;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-family:Arial">🖨️ Imprimir / Guardar PDF</button>
+  </div>
+  </body></html>`);
+  win.document.close();
 }
 
 function updateBadge(){
@@ -496,8 +700,6 @@ function updateBadge(){
   const b=document.getElementById('badge-pending');
   b.textContent=n;b.style.display=n>0?'':'none';
 }
-
-// TOAST
 function showToast(msg,type){
   const t=document.getElementById('toast');
   t.textContent=(type==='ok'?'✓ ':'✕ ')+msg;
@@ -506,40 +708,7 @@ function showToast(msg,type){
   setTimeout(()=>t.style.display='none',3000);
 }
 
-// AUTH
-const PWD='AlmacenZX2026ERP';
-let almacenAuth=false;
-
-function checkAlmacen(e){
-  e.preventDefault();
-  if(almacenAuth){goView('almacen');return;}
-  document.getElementById('modal-overlay').style.display='flex';
-  document.getElementById('pwd-input').value='';
-  document.getElementById('pwd-error').style.display='none';
-  setTimeout(()=>document.getElementById('pwd-input').focus(),100);
-}
-
-function verifyPwd(){
-  const val=document.getElementById('pwd-input').value;
-  if(val===PWD){
-    almacenAuth=true;
-    closeModal();
-    goView('almacen');
-    document.querySelector('[data-view="almacen"]').classList.add('active');
-  } else {
-    document.getElementById('pwd-error').style.display='block';
-    document.getElementById('pwd-input').value='';
-    document.getElementById('pwd-input').focus();
-  }
-}
-
-function closeModal(){
-  document.getElementById('modal-overlay').style.display='none';
-}
-
-// INIT
-addItemRow();
-renderPortal();
+addItemRow();renderPortal();
 </script>
 </body>
 </html>
