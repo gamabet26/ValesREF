@@ -30,11 +30,9 @@ nav{padding:14px 10px;flex:1}
 .card-title{font-size:15px;font-weight:600;color:var(--navy);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
 .g5{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:28px}
 .metric{background:#fff;border-radius:12px;padding:18px 20px;box-shadow:0 1px 3px rgba(13,43,85,.08);cursor:pointer;transition:transform .15s,box-shadow .15s}
 .metric:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(13,43,85,.12)}
-.metric.selected{outline:2px solid var(--accent)}
 .metric-icon{font-size:22px;margin-bottom:6px}
 .metric-num{font-size:30px;font-weight:700}
 .metric-label{font-size:12px;color:var(--gray);margin-top:2px}
@@ -97,11 +95,9 @@ td{padding:7px 10px;font-size:13px;color:#334155;border-bottom:1px solid #f8fafc
 .nota-input-row input{flex:1}
 .info-alert{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 16px;font-size:14px;color:#92400e;margin-bottom:16px}
 .success-alert{background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:20px;text-align:center;font-size:15px;font-weight:600;color:#15803d}
-/* FILTER TABS */
 .filter-bar{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
 .ftab{padding:6px 16px;border-radius:20px;border:1px solid var(--border);background:#fff;font-size:13px;cursor:pointer;font-family:inherit;color:var(--gray);transition:all .15s}
 .ftab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
-/* REGISTRO EXCEL TABLE */
 .reg-table-wrap{overflow-x:auto}
 .reg-table{width:100%;border-collapse:collapse;font-size:12px;min-width:900px}
 .reg-table th{background:#0D2B55;color:#fff;padding:8px 10px;text-align:left;font-weight:500;white-space:nowrap}
@@ -109,38 +105,36 @@ td{padding:7px 10px;font-size:13px;color:#334155;border-bottom:1px solid #f8fafc
 .reg-table tr:hover td{background:#f8fafc}
 .sap-ok{color:#15803d;font-weight:600}
 .sap-pending{color:#94a3b8}
-/* MODAL */
-#modal-overlay{display:none;position:fixed;inset:0;background:rgba(13,43,85,.55);z-index:500;align-items:center;justify-content:center}
-/* PDF PRINT */
-@media print{
-  #sidebar,#main .topbar,#main .filter-bar,.card-actions,#toast,#modal-overlay,#modal-sap,#watermark{display:none!important}
-  #main{margin:0;padding:0}
-  .view{display:none!important}
-  #pdf-frame{display:block!important}
-}
-#pdf-frame{display:none}
+#modal-overlay,#modal-sap{display:none;position:fixed;inset:0;background:rgba(13,43,85,.55);z-index:500;align-items:center;justify-content:center}
+.notif-banner{position:fixed;top:16px;right:16px;z-index:998;background:#fff;border-radius:12px;padding:16px 20px;box-shadow:0 8px 24px rgba(13,43,85,.18);border-left:4px solid var(--accent);max-width:320px;display:none;animation:slideIn .3s ease}
+@keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+.notif-title{font-weight:600;font-size:14px;color:var(--navy);margin-bottom:4px}
+.notif-body{font-size:13px;color:var(--gray)}
+.device-id{font-size:10px;color:rgba(255,255,255,.3);margin-top:4px;font-family:monospace}
 </style>
 </head>
 <body>
 <div id="watermark">ZX</div>
 
-<!-- SIDEBAR -->
 <div id="sidebar">
   <div class="sb-logo">
     <div class="sb-zx">ZX</div>
-    <div><div class="sb-name">Zubex</div><div class="sb-sub">Almacén de refacciones</div></div>
+    <div>
+      <div class="sb-name">Zubex</div>
+      <div class="sb-sub">Almacén de refacciones</div>
+      <div class="device-id" id="device-label"></div>
+    </div>
   </div>
   <nav>
     <button class="nav-btn active" data-view="portal">🏠 &nbsp;Inicio</button>
     <button class="nav-btn" data-view="nuevo">📋 &nbsp;Nuevo vale</button>
-    <button class="nav-btn" data-view="estatus">🔍 &nbsp;Mi pedido</button>
+    <button class="nav-btn" data-view="estatus">🔍 &nbsp;Mis pedidos</button>
     <button class="nav-btn" data-view="almacen" onclick="checkAlmacen(event)">🔧 &nbsp;Almacenista <span class="nav-badge" id="badge-pending" style="display:none">0</span></button>
     <button class="nav-btn" data-view="registro" onclick="checkRegistro(event)">📊 &nbsp;Registro SAP</button>
   </nav>
   <div class="sb-footer">Sistema de gestión v1.0</div>
 </div>
 
-<!-- MAIN -->
 <div id="main">
   <div class="topbar">
     <div><h1 id="page-title">Inicio</h1><p id="page-date"></p></div>
@@ -152,7 +146,7 @@ td{padding:7px 10px;font-size:13px;color:#334155;border-bottom:1px solid #f8fafc
 
   <!-- PORTAL -->
   <div class="view active" id="view-portal">
-    <div class="g5" id="metrics">
+    <div class="g5">
       <div class="metric" style="border-top:4px solid #a8cce8" onclick="goViewFilter('almacen','recibido')"><div class="metric-icon">📥</div><div class="metric-num" style="color:#1a4f7a" id="cnt-recibido">0</div><div class="metric-label">Recibidos</div></div>
       <div class="metric" style="border-top:4px solid #f0c060" onclick="goViewFilter('almacen','surtiendo')"><div class="metric-icon">⚙️</div><div class="metric-num" style="color:#7a4a00" id="cnt-surtiendo">0</div><div class="metric-label">En proceso</div></div>
       <div class="metric" style="border-top:4px solid #88c98f" onclick="goViewFilter('almacen','listo')"><div class="metric-icon">✅</div><div class="metric-num" style="color:#2e6e35" id="cnt-listo">0</div><div class="metric-label">Listos</div></div>
@@ -164,11 +158,11 @@ td{padding:7px 10px;font-size:13px;color:#334155;border-bottom:1px solid #f8fafc
         <p class="card-title">¿Cómo funciona?</p>
         <div class="step"><div class="step-num">1</div><div><p class="step-t">Llena el vale digital</p><p class="step-d">Busca artículos por código o descripción</p></div></div>
         <div class="step"><div class="step-num">2</div><div><p class="step-t">Envía y obtén tu folio</p><p class="step-d">El pedido llega al almacenista en segundos</p></div></div>
-        <div class="step"><div class="step-num">3</div><div><p class="step-t">Rastreo en tiempo real</p><p class="step-d">Ve el estado desde cualquier dispositivo</p></div></div>
+        <div class="step"><div class="step-num">3</div><div><p class="step-t">Rastreo en tiempo real</p><p class="step-d">Recibes una notificación cuando cambie tu estatus</p></div></div>
         <div class="step"><div class="step-num">4</div><div><p class="step-t">Solo pasa cuando esté listo</p><p class="step-d">Sin filas, sin esperas innecesarias</p></div></div>
       </div>
       <div class="card">
-        <p class="card-title">Cola activa</p>
+        <p class="card-title">Mis pedidos activos</p>
         <div id="portal-queue"><div class="empty" style="padding:24px 0"><div class="empty-icon">📭</div><p>Sin pedidos activos</p></div></div>
       </div>
     </div>
@@ -197,7 +191,7 @@ td{padding:7px 10px;font-size:13px;color:#334155;border-bottom:1px solid #f8fafc
     </div>
   </div>
 
-  <!-- MI PEDIDO -->
+  <!-- MIS PEDIDOS -->
   <div class="view" id="view-estatus"><div id="estatus-content"></div></div>
 
   <!-- ALMACENISTA -->
@@ -205,7 +199,7 @@ td{padding:7px 10px;font-size:13px;color:#334155;border-bottom:1px solid #f8fafc
     <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
       <input id="alm-search" placeholder="🔍  Buscar por folio, nombre o departamento…" style="flex:1;min-width:200px" oninput="renderAlmacen()">
     </div>
-    <div class="filter-bar" id="alm-filters">
+    <div class="filter-bar">
       <button class="ftab active" data-filter="todos" onclick="setFilter('todos',this)">Todos</button>
       <button class="ftab" data-filter="recibido" onclick="setFilter('recibido',this)">⏳ Recibidos</button>
       <button class="ftab" data-filter="surtiendo" onclick="setFilter('surtiendo',this)">🔄 Surtiéndose</button>
@@ -221,15 +215,19 @@ td{padding:7px 10px;font-size:13px;color:#334155;border-bottom:1px solid #f8fafc
     <div class="card">
       <p class="card-title">Registro de vales — Control SAP</p>
       <div class="reg-table-wrap">
-        <table class="reg-table" id="reg-table">
-          <thead><tr>
-            <th>#</th><th>Folio</th><th>Fecha</th><th>Solicitante</th><th>Depto.</th><th>Área</th><th>Tipo</th><th>Artículos</th><th>Estatus</th><th>Capturado SAP</th><th>Quién capturó</th>
-          </tr></thead>
+        <table class="reg-table">
+          <thead><tr><th>#</th><th>Folio</th><th>Fecha</th><th>Solicitante</th><th>Depto.</th><th>Área</th><th>Tipo</th><th>Artículos</th><th>Estatus</th><th>Capturado SAP</th><th>Quién capturó</th></tr></thead>
           <tbody id="reg-tbody"><tr><td colspan="11" style="text-align:center;color:#94a3b8;padding:32px">Sin vales registrados aún</td></tr></tbody>
         </table>
       </div>
     </div>
   </div>
+</div>
+
+<!-- NOTIF BANNER -->
+<div class="notif-banner" id="notif-banner">
+  <div class="notif-title" id="notif-title"></div>
+  <div class="notif-body" id="notif-body"></div>
 </div>
 
 <!-- MODAL CONTRASEÑA -->
@@ -251,8 +249,7 @@ td{padding:7px 10px;font-size:13px;color:#334155;border-bottom:1px solid #f8fafc
     <h2 style="font-size:16px;font-weight:600;color:#0D2B55;margin-bottom:6px">Registrar captura en SAP</h2>
     <p style="font-size:13px;color:#64748b;margin-bottom:18px">Folio: <b id="sap-folio-label"></b></p>
     <div style="margin-bottom:14px"><label class="fl">¿Capturado en SAP?</label>
-      <select id="sap-status-sel"><option value="OK">✅ OK — Capturado</option><option value="">Pendiente</option></select>
-    </div>
+      <select id="sap-status-sel"><option value="OK">✅ OK — Capturado</option><option value="">Pendiente</option></select></div>
     <div style="margin-bottom:20px"><label class="fl">Quién capturó en SAP</label>
       <input id="sap-quien" placeholder="Nombre del capturista"></div>
     <div style="display:flex;gap:8px">
@@ -262,13 +259,157 @@ td{padding:7px 10px;font-size:13px;color:#334155;border-bottom:1px solid #f8fafc
   </div>
 </div>
 
-<!-- PDF FRAME (hidden, solo print) -->
-<div id="pdf-frame"></div>
-
-<!-- TOAST -->
 <div id="toast"></div>
 
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, push, onValue, update, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getMessaging, getToken, onMessage }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC7wLm9cFWpLVjLCRoX5FIMJr6pr1hdoHQ",
+  authDomain: "almacenzx.firebaseapp.com",
+  databaseURL: "https://almacenzx-default-rtdb.firebaseio.com",
+  projectId: "almacenzx",
+  storageBucket: "almacenzx.firebasestorage.app",
+  messagingSenderId: "806380031146",
+  appId: "1:806380031146:web:7c72619106eb9a889dd4d3"
+};
+
+const VAPID = "BEryXOMNV5xQ6gKm36poSPhGlhaYEkOqNA9TLhU--T__33AxT3z_Vo6Jh55VTJ7F4aYylJMuUeiWipr0imQGikU";
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+
+// ── DEVICE ID ──────────────────────────────────────────────
+let deviceId = localStorage.getItem('zx_device_id');
+if(!deviceId){ deviceId = 'dev_'+Math.random().toString(36).slice(2,10); localStorage.setItem('zx_device_id', deviceId); }
+document.getElementById('device-label').textContent = 'ID: '+deviceId;
+window._deviceId = deviceId;
+
+// ── PEDIDOS STATE ──────────────────────────────────────────
+window._pedidos = {};
+
+// ── FIREBASE LISTENER ─────────────────────────────────────
+const pedidosRef = ref(db, 'pedidos');
+onValue(pedidosRef, snap => {
+  const data = snap.val() || {};
+  const prev = {...window._pedidos};
+  window._pedidos = data;
+
+  // Notificar cambios de estatus a pedidos de ESTE dispositivo
+  Object.entries(data).forEach(([key, p]) => {
+    if(p.deviceId !== deviceId) return;
+    const old = prev[key];
+    if(old && old.status !== p.status){
+      showInAppNotif('📦 Pedido #'+p.folio, STATUS[p.status].icon+' '+STATUS[p.status].label);
+      showBrowserNotif('Pedido #'+p.folio+' — Almacén Zubex', STATUS[p.status].icon+' '+STATUS[p.status].label);
+    }
+  });
+
+  // Re-render vistas activas
+  const active = document.querySelector('.view.active');
+  if(active){
+    const v = active.id.replace('view-','');
+    if(v==='portal') renderPortal();
+    else if(v==='almacen') renderAlmacen();
+    else if(v==='estatus') renderEstatus();
+    else if(v==='registro') renderRegistro();
+  }
+  updateBadge();
+});
+
+// ── SUBMIT ─────────────────────────────────────────────────
+window.submitPedido = function(){
+  const sol = document.getElementById('f-sol').value.trim();
+  const dep = document.getElementById('f-dep').value.trim();
+  if(!sol||!dep){ showToast('Completa solicitante y departamento','err'); return; }
+  const items = getItems();
+  if(!items.length){ showToast('Agrega al menos un artículo','err'); return; }
+  const folio = Date.now(); // folio único basado en timestamp
+  const pedido = {
+    folio, fecha: new Date().toLocaleString('es-MX'),
+    solicitante: sol, departamento: dep,
+    area: document.getElementById('f-area').value,
+    linea: document.getElementById('f-linea').value,
+    tipoGasto: document.getElementById('f-tipo').value,
+    items, status: 'recibido', nota: '',
+    sapStatus: '', sapQuien: '',
+    deviceId, createdAt: Date.now()
+  };
+  push(pedidosRef, pedido).then(r => {
+    window._myKey = r.key;
+    window._myFolio = folio;
+    localStorage.setItem('zx_my_keys', JSON.stringify([...(JSON.parse(localStorage.getItem('zx_my_keys')||'[]')), r.key]));
+    document.getElementById('f-sol').value='';
+    document.getElementById('f-dep').value='';
+    document.getElementById('items-container').innerHTML=''; 
+    window._itemCount=0; addItemRow();
+    showToast('Vale #'+folio+' enviado','ok');
+    goView('estatus');
+  });
+};
+
+// ── CAMBIAR STATUS (almacenista) ───────────────────────────
+window.cambiarStatus = function(key, status){
+  update(ref(db,'pedidos/'+key), {status}).then(()=>{
+    const p = window._pedidos[key];
+    showToast('Folio #'+(p?p.folio:'')+': '+STATUS[status].label,'ok');
+  });
+};
+
+// ── NOTA ──────────────────────────────────────────────────
+window.saveNota = function(key){
+  const nota = document.getElementById('nota-input-'+key).value;
+  update(ref(db,'pedidos/'+key), {nota}).then(()=>{ renderAlmacen(); showToast('Nota guardada','ok'); });
+};
+
+// ── SAP ───────────────────────────────────────────────────
+window._currentSapKey = null;
+window.openSapModal = function(key){
+  const p = window._pedidos[key];
+  window._currentSapKey = key;
+  document.getElementById('sap-folio-label').textContent = '#'+p.folio;
+  document.getElementById('sap-status-sel').value = p.sapStatus||'';
+  document.getElementById('sap-quien').value = p.sapQuien||'';
+  document.getElementById('modal-sap').style.display='flex';
+};
+window.saveSap = function(){
+  update(ref(db,'pedidos/'+window._currentSapKey),{
+    sapStatus: document.getElementById('sap-status-sel').value,
+    sapQuien:  document.getElementById('sap-quien').value
+  }).then(()=>{ document.getElementById('modal-sap').style.display='none'; showToast('Registro SAP actualizado','ok'); });
+};
+
+// ── NOTIFICACIONES ─────────────────────────────────────────
+async function initNotifications(){
+  if(!('Notification' in window)) return;
+  const perm = await Notification.requestPermission();
+  if(perm !== 'granted') return;
+  try {
+    const messaging = getMessaging(app);
+    const token = await getToken(messaging, {vapidKey: VAPID});
+    // Guardar token por dispositivo para futuros push
+    if(token) update(ref(db,'fcmTokens/'+deviceId), {token, updated: Date.now()});
+    onMessage(messaging, payload => {
+      showInAppNotif(payload.notification?.title||'Almacén ZX', payload.notification?.body||'');
+    });
+  } catch(e){ console.log('FCM init:', e.message); }
+}
+initNotifications();
+
+// ── SERVICE WORKER ─────────────────────────────────────────
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(()=>{});
+}
+
+</script>
+
 <script>
+// ── CATÁLOGO ───────────────────────────────────────────────
 const ITEMS=[
 {id:"80-1001-008",desc:"REQUERIMIENTO DE COMPRA",qty:6},
 {id:"80-1001-010",desc:"ORDEN DE SALIDA",qty:10},
@@ -342,9 +483,10 @@ const STATUS={
   parcial:{label:"Surtido parcial",cls:"s-parcial",icon:"⚠️"},
 };
 
-const TITLES={portal:"Inicio",nuevo:"Nuevo vale",estatus:"Mi pedido",almacen:"Almacenista",registro:"Registro SAP"};
-let pedidos=[],myFolio=null,nextFolio=36809,itemCount=0,almacenAuth=false,currentFilter='todos',currentSapFolio=null;
-const PWD='AlmacenZX2026ERP';
+const TITLES={portal:"Inicio",nuevo:"Nuevo vale",estatus:"Mis pedidos",almacen:"Almacenista",registro:"Registro SAP"};
+let almacenAuth=false, currentFilter='todos', _itemCount=0;
+window._itemCount=0;
+window._pedidos=window._pedidos||{};
 
 // DATE
 const days=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
@@ -358,24 +500,26 @@ function goView(v){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('view-'+v).classList.add('active');
   const nb=document.querySelector('[data-view="'+v+'"]');
-  if(nb) nb.classList.add('active');
+  if(nb)nb.classList.add('active');
   document.getElementById('page-title').textContent=TITLES[v];
   document.getElementById('btn-enviar').style.display=v==='nuevo'?'':'none';
   document.getElementById('btn-excel').style.display=v==='registro'?'':'none';
-  if(v==='estatus') renderEstatus();
-  if(v==='almacen') renderAlmacen();
   if(v==='portal') renderPortal();
-  if(v==='registro') renderRegistro();
+  else if(v==='almacen') renderAlmacen();
+  else if(v==='estatus') renderEstatus();
+  else if(v==='registro') renderRegistro();
 }
+window.goView=goView;
 
 function goViewFilter(v,filter){
   if(!almacenAuth){checkAlmacen({preventDefault:()=>{}});return;}
   currentFilter=filter;
   document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
   const tab=document.querySelector('[data-filter="'+filter+'"]');
-  if(tab) tab.classList.add('active');
+  if(tab)tab.classList.add('active');
   goView(v);
 }
+window.goViewFilter=goViewFilter;
 
 function setFilter(f,el){
   currentFilter=f;
@@ -383,10 +527,11 @@ function setFilter(f,el){
   el.classList.add('active');
   renderAlmacen();
 }
+window.setFilter=setFilter;
 
 // AUTH
 function checkAlmacen(e){
-  if(e&&e.preventDefault) e.preventDefault();
+  if(e&&e.preventDefault)e.preventDefault();
   if(almacenAuth){goView('almacen');return;}
   document.getElementById('modal-overlay').style.display='flex';
   document.getElementById('pwd-input').value='';
@@ -394,27 +539,33 @@ function checkAlmacen(e){
   setTimeout(()=>document.getElementById('pwd-input').focus(),100);
 }
 function checkRegistro(e){
-  if(e&&e.preventDefault) e.preventDefault();
+  if(e&&e.preventDefault)e.preventDefault();
   if(almacenAuth){goView('registro');return;}
-  document.getElementById('modal-overlay').style.display='flex';
-  document.getElementById('pwd-input').value='';
-  document.getElementById('pwd-error').style.display='none';
-  setTimeout(()=>document.getElementById('pwd-input').focus(),100);
+  checkAlmacen(e);
 }
 function verifyPwd(){
-  if(document.getElementById('pwd-input').value===PWD){almacenAuth=true;closeModal();goView('almacen');}
-  else{document.getElementById('pwd-error').style.display='block';document.getElementById('pwd-input').value='';document.getElementById('pwd-input').focus();}
+  if(document.getElementById('pwd-input').value==='AlmacenZX2026ERP'){
+    almacenAuth=true;closeModal();goView('almacen');
+  } else {
+    document.getElementById('pwd-error').style.display='block';
+    document.getElementById('pwd-input').value='';
+    document.getElementById('pwd-input').focus();
+  }
 }
 function closeModal(){document.getElementById('modal-overlay').style.display='none';}
+window.checkAlmacen=checkAlmacen;
+window.checkRegistro=checkRegistro;
+window.verifyPwd=verifyPwd;
+window.closeModal=closeModal;
 
 document.querySelectorAll('.nav-btn').forEach(b=>{
-  if(b.dataset.view==='almacen'||b.dataset.view==='registro') return;
+  if(b.dataset.view==='almacen'||b.dataset.view==='registro')return;
   b.addEventListener('click',()=>goView(b.dataset.view));
 });
 
 // ITEM ROWS
 function addItemRow(){
-  const idx=itemCount++;
+  const idx=window._itemCount++;
   const row=document.createElement('div');
   row.className='item-row';row.id='item-row-'+idx;
   row.innerHTML=`<input placeholder="Código" id="ic-${idx}" oninput="syncDesc(${idx})">
@@ -434,7 +585,7 @@ function filterDrop(idx){
   if(q.length<1){dd.classList.remove('open');return;}
   const m=ITEMS.filter(x=>x.id.toLowerCase().includes(q)||x.desc.toLowerCase().includes(q)).slice(0,8);
   if(!m.length){dd.classList.remove('open');return;}
-  dd.innerHTML=m.map(i=>`<div class="drop-item" onmousedown="selectItem(${idx},'${i.id}','${i.desc.replace(/'/g,"\\'")}',${i.qty})"><span>${i.id}</span><b>${i.desc}</b> <span class="${i.qty>0?'stock-ok':'stock-no'}">● Stock: ${i.qty}</span></div>`).join('');
+  dd.innerHTML=m.map(i=>`<div class="drop-item" onmousedown="selectItem(${idx},'${i.id}','${i.desc.replace(/'/g,"\\'")}')"><span>${i.id}</span><b>${i.desc}</b> <span class="${i.qty>0?'stock-ok':'stock-no'}">● Stock: ${i.qty}</span></div>`).join('');
   dd.classList.add('open');
 }
 function selectItem(idx,id,desc){
@@ -450,65 +601,64 @@ function getItems(){
     return{codigo:document.getElementById('ic-'+i).value,descripcion:document.getElementById('id-'+i).value,cantidad:document.getElementById('iq-'+i).value,unidad:document.getElementById('iu-'+i).value};
   }).filter(x=>x.descripcion&&x.cantidad);
 }
+window.addItemRow=addItemRow;window.syncDesc=syncDesc;window.openDrop=openDrop;
+window.filterDrop=filterDrop;window.selectItem=selectItem;window.closeDrop=closeDrop;
+window.removeRow=removeRow;
 
-// SUBMIT
-function submitPedido(){
-  const sol=document.getElementById('f-sol').value.trim();
-  const dep=document.getElementById('f-dep').value.trim();
-  if(!sol||!dep){showToast('Completa solicitante y departamento','err');return;}
-  const items=getItems();
-  if(!items.length){showToast('Agrega al menos un artículo','err');return;}
-  const folio=nextFolio++;
-  pedidos.unshift({folio,fecha:new Date().toLocaleString('es-MX'),solicitante:sol,departamento:dep,area:document.getElementById('f-area').value,linea:document.getElementById('f-linea').value,tipoGasto:document.getElementById('f-tipo').value,items,status:'recibido',nota:'',sapStatus:'',sapQuien:''});
-  myFolio=folio;
-  document.getElementById('f-sol').value='';document.getElementById('f-dep').value='';
-  document.getElementById('items-container').innerHTML='';itemCount=0;addItemRow();
-  updateBadge();showToast('Vale #'+folio+' enviado correctamente','ok');goView('estatus');
-}
-
-// PORTAL
+// PORTAL — solo muestra pedidos del dispositivo actual
 function renderPortal(){
+  const myKeys = JSON.parse(localStorage.getItem('zx_my_keys')||'[]');
+  const all = Object.values(window._pedidos);
+  const mine = all.filter(p=>myKeys.includes(Object.keys(window._pedidos).find(k=>window._pedidos[k]===p)));
   const cnt={recibido:0,surtiendo:0,listo:0,sinstock:0,parcial:0};
-  pedidos.forEach(p=>{cnt[p.status]=(cnt[p.status]||0)+1;});
+  all.forEach(p=>{cnt[p.status]=(cnt[p.status]||0)+1;});
   Object.keys(cnt).forEach(s=>{const el=document.getElementById('cnt-'+s);if(el)el.textContent=cnt[s]||0;});
-  const active=pedidos.filter(p=>p.status==='recibido'||p.status==='surtiendo').slice(0,6);
+  const myActive = getMyPedidos().filter(p=>p.status==='recibido'||p.status==='surtiendo').slice(0,6);
   const q=document.getElementById('portal-queue');
-  if(!active.length){q.innerHTML='<div class="empty" style="padding:24px 0"><div class="empty-icon">📭</div><p>Sin pedidos activos</p></div>';return;}
-  q.innerHTML=active.map(p=>`<div class="q-row"><div><b style="color:var(--navy)">#${p.folio}</b><span style="color:var(--gray);margin-left:8px">${p.solicitante}</span></div><span class="badge ${STATUS[p.status].cls}">${STATUS[p.status].icon} ${STATUS[p.status].label}</span></div>`).join('');
+  if(!myActive.length){q.innerHTML='<div class="empty" style="padding:24px 0"><div class="empty-icon">📭</div><p>No tienes pedidos activos</p></div>';return;}
+  q.innerHTML=myActive.map(([,p])=>`<div class="q-row"><div><b style="color:var(--navy)">#${p.folio}</b><span style="color:var(--gray);margin-left:8px">${p.solicitante}</span></div><span class="badge ${STATUS[p.status].cls}">${STATUS[p.status].icon} ${STATUS[p.status].label}</span></div>`).join('');
 }
 
-// ESTATUS
+function getMyPedidos(){
+  const myKeys=JSON.parse(localStorage.getItem('zx_my_keys')||'[]');
+  return Object.entries(window._pedidos).filter(([k])=>myKeys.includes(k));
+}
+
+// MIS PEDIDOS
 function renderEstatus(){
   const c=document.getElementById('estatus-content');
-  const p=pedidos.find(x=>x.folio===myFolio);
-  if(!p){c.innerHTML=`<div class="card empty"><div class="empty-icon">📋</div><p>No tienes un pedido activo en esta sesión.</p><br><button class="btn btn-navy" onclick="goView('nuevo')">Crear nuevo vale</button></div>`;return;}
-  const s=STATUS[p.status];
-  c.innerHTML=`<div class="folio-banner s-${p.status}" style="border-color:currentColor">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start">
-      <div><p style="font-size:13px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Folio</p><div class="folio-num">#${p.folio}</div><p style="font-size:13px;opacity:.7;margin-top:8px">${p.fecha}</p></div>
-      <div style="text-align:right"><div style="font-size:48px">${s.icon}</div><div style="font-size:15px;font-weight:600;margin-top:4px">${s.label}</div></div>
-    </div></div>
-  <div class="card">
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #f1f5f9">
-      <div><p style="font-size:12px;color:#94a3b8;font-weight:500">Solicitante</p><p style="font-size:15px;font-weight:500;color:#1e293b;margin-top:4px">${p.solicitante}</p></div>
-      <div><p style="font-size:12px;color:#94a3b8;font-weight:500">Departamento</p><p style="font-size:15px;font-weight:500;color:#1e293b;margin-top:4px">${p.departamento}</p></div>
-      <div><p style="font-size:12px;color:#94a3b8;font-weight:500">Tipo de gasto</p><p style="font-size:15px;font-weight:500;color:#1e293b;margin-top:4px">${p.tipoGasto}</p></div>
-    </div>
-    <table><thead><tr><th>Artículo</th><th class="r">Cant.</th><th class="r">Unidad</th></tr></thead>
-    <tbody>${p.items.map(it=>`<tr><td>${it.descripcion}</td><td class="r" style="font-weight:500">${it.cantidad}</td><td class="r" style="color:#94a3b8">${it.unidad}</td></tr>`).join('')}</tbody></table>
-    ${p.nota?`<div class="info-alert" style="margin-top:14px">⚠️ <b>Nota del almacenista:</b> ${p.nota}</div>`:''}
-    ${p.status==='listo'?`<div class="success-alert" style="margin-top:14px">✅ Tu material está listo. Por favor pasa a ventanilla a recogerlo.</div>`:''}
-  </div>`;
+  const mine=getMyPedidos();
+  if(!mine.length){c.innerHTML=`<div class="card empty"><div class="empty-icon">📋</div><p>No tienes pedidos registrados en este dispositivo.</p><br><button class="btn btn-navy" onclick="goView('nuevo')">Crear nuevo vale</button></div>`;return;}
+  c.innerHTML=mine.map(([key,p])=>{
+    const s=STATUS[p.status];
+    return`<div class="card border-l-${p.status}" style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div><span style="font-size:20px;font-weight:700;color:var(--navy)">#${p.folio}</span><span style="font-size:12px;color:#94a3b8;margin-left:10px">${p.fecha}</span></div>
+        <span class="badge ${s.cls}">${s.icon} ${s.label}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;font-size:13px">
+        <div><span style="color:#94a3b8;font-size:11px;display:block">Solicitante</span><b>${p.solicitante}</b></div>
+        <div><span style="color:#94a3b8;font-size:11px;display:block">Departamento</span><b>${p.departamento}</b></div>
+        <div><span style="color:#94a3b8;font-size:11px;display:block">Tipo de gasto</span><b>${p.tipoGasto}</b></div>
+      </div>
+      <table><thead><tr><th>Artículo</th><th class="r">Cant.</th><th class="r">Unidad</th></tr></thead>
+      <tbody>${p.items.map(it=>`<tr><td>${it.descripcion}</td><td class="r" style="font-weight:500">${it.cantidad}</td><td class="r" style="color:#94a3b8">${it.unidad}</td></tr>`).join('')}</tbody></table>
+      ${p.nota?`<div class="info-alert" style="margin-top:12px">⚠️ <b>Nota del almacenista:</b> ${p.nota}</div>`:''}
+      ${p.status==='listo'?`<div class="success-alert" style="margin-top:12px">✅ Tu material está listo. Pasa a ventanilla a recogerlo.</div>`:''}
+    </div>`;
+  }).join('');
 }
 
-// ALMACENISTA
+// ALMACENISTA — ve todos
 function renderAlmacen(){
   const q=(document.getElementById('alm-search').value||'').toLowerCase();
-  let filtered=pedidos.filter(p=>!q||p.folio.toString().includes(q)||p.solicitante.toLowerCase().includes(q)||p.departamento.toLowerCase().includes(q));
-  if(currentFilter!=='todos') filtered=filtered.filter(p=>p.status===currentFilter);
+  let entries=Object.entries(window._pedidos);
+  if(currentFilter!=='todos') entries=entries.filter(([,p])=>p.status===currentFilter);
+  if(q) entries=entries.filter(([,p])=>p.folio?.toString().includes(q)||p.solicitante?.toLowerCase().includes(q)||p.departamento?.toLowerCase().includes(q));
+  entries.sort(([,a],[,b])=>b.createdAt-a.createdAt);
   const el=document.getElementById('almacen-list');
-  if(!filtered.length){el.innerHTML='<div class="card empty"><div class="empty-icon">📭</div><p>No hay pedidos con este filtro.</p></div>';return;}
-  el.innerHTML=filtered.map(p=>{
+  if(!entries.length){el.innerHTML='<div class="card empty"><div class="empty-icon">📭</div><p>No hay pedidos con este filtro.</p></div>';return;}
+  el.innerHTML=entries.map(([key,p])=>{
     const s=STATUS[p.status];
     return`<div class="card border-l-${p.status}" style="margin-bottom:16px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
@@ -518,75 +668,53 @@ function renderAlmacen(){
           <div style="margin-top:4px;font-size:14px;color:#334155;font-weight:500">${p.solicitante} <span style="color:#94a3b8;font-weight:400">— ${p.departamento}</span>
             ${p.area?`<span class="tag tag-gray">${p.area}</span>`:''}
             <span class="tag tag-indigo">${p.tipoGasto}</span>
+            <span style="font-size:10px;color:#94a3b8;margin-left:6px">📱${p.deviceId||''}</span>
           </div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
           <span class="badge ${s.cls}">${s.icon} ${s.label}</span>
           <div style="display:flex;gap:6px">
-            <button class="btn-sm s-listo" onclick="printPDF(${p.folio})" title="Imprimir PDF">🖨️ PDF</button>
-            <button class="btn-sm tag-indigo" style="background:#eef2ff;border-color:#c7d2fe" onclick="openSapModal(${p.folio})">📋 SAP ${p.sapStatus?'<b style=color:#15803d>✓</b>':''}</button>
+            <button class="btn-sm s-listo" onclick="printPDF('${key}')">🖨️ PDF</button>
+            <button class="btn-sm tag-indigo" style="background:#eef2ff;border-color:#c7d2fe" onclick="openSapModal('${key}')">📋 SAP${p.sapStatus?' ✓':''}</button>
           </div>
         </div>
       </div>
       <table style="margin-bottom:14px"><thead><tr style="background:#f8fafc"><th>Artículo</th><th>Cant.</th><th>Unidad</th></tr></thead>
-      <tbody>${p.items.map(it=>`<tr><td>${it.descripcion}</td><td class="r" style="font-weight:500">${it.cantidad}</td><td class="r" style="color:#94a3b8">${it.unidad}</td></tr>`).join('')}</tbody></table>
+      <tbody>${(p.items||[]).map(it=>`<tr><td>${it.descripcion}</td><td class="r" style="font-weight:500">${it.cantidad}</td><td class="r" style="color:#94a3b8">${it.unidad}</td></tr>`).join('')}</tbody></table>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
-        ${Object.entries(STATUS).map(([st,cfg])=>`<button class="pill-btn ${cfg.cls}" style="${p.status===st?'font-weight:600':''}" onclick="cambiarStatus(${p.folio},'${st}')">${cfg.icon} ${cfg.label}</button>`).join('')}
+        ${Object.entries(STATUS).map(([st,cfg])=>`<button class="pill-btn ${cfg.cls}" style="${p.status===st?'font-weight:700':''}" onclick="cambiarStatus('${key}','${st}')">${cfg.icon} ${cfg.label}</button>`).join('')}
       </div>
-      <div id="nota-area-${p.folio}">
+      <div id="nota-area-${key}">
         ${p.nota?`<div class="nota-box">📝 ${p.nota}</div>`:''}
-        <button class="btn btn-outline" style="font-size:12px;padding:5px 14px;border-radius:20px;margin-top:6px" onclick="toggleNota(${p.folio})">${p.nota?'✏️ Editar nota':'+ Agregar nota'}</button>
+        <button class="btn btn-outline" style="font-size:12px;padding:5px 14px;border-radius:20px;margin-top:6px" onclick="toggleNota('${key}','${(p.nota||'').replace(/'/g,"\\'")}')">
+          ${p.nota?'✏️ Editar nota':'+ Agregar nota'}
+        </button>
       </div>
     </div>`;
   }).join('');
 }
 
-function cambiarStatus(folio,status){
-  const p=pedidos.find(x=>x.folio===folio);
-  if(p){p.status=status;updateBadge();renderAlmacen();renderPortal();showToast('Folio #'+folio+': '+STATUS[status].label,'ok');}
-}
-function toggleNota(folio){
-  const p=pedidos.find(x=>x.folio===folio);
-  document.getElementById('nota-area-'+folio).innerHTML=`<div class="nota-input-row">
-    <input id="nota-input-${folio}" value="${p.nota||''}" placeholder="Nota para el operador…">
-    <button class="btn btn-navy" style="padding:0 16px;white-space:nowrap" onclick="saveNota(${folio})">Guardar</button>
+function toggleNota(key, current){
+  document.getElementById('nota-area-'+key).innerHTML=`<div class="nota-input-row">
+    <input id="nota-input-${key}" value="${current}" placeholder="Nota para el operador…">
+    <button class="btn btn-navy" style="padding:0 16px;white-space:nowrap" onclick="saveNota('${key}')">Guardar</button>
     <button class="btn" style="padding:0 12px;border:1px solid #e2e8f0;background:transparent" onclick="renderAlmacen()">×</button>
   </div>`;
 }
-function saveNota(folio){
-  const p=pedidos.find(x=>x.folio===folio);
-  if(p){p.nota=document.getElementById('nota-input-'+folio).value;renderAlmacen();showToast('Nota guardada','ok');}
-}
-
-// SAP MODAL
-function openSapModal(folio){
-  const p=pedidos.find(x=>x.folio===folio);
-  currentSapFolio=folio;
-  document.getElementById('sap-folio-label').textContent='#'+folio;
-  document.getElementById('sap-status-sel').value=p.sapStatus||'';
-  document.getElementById('sap-quien').value=p.sapQuien||'';
-  document.getElementById('modal-sap').style.display='flex';
-}
-function saveSap(){
-  const p=pedidos.find(x=>x.folio===currentSapFolio);
-  if(p){p.sapStatus=document.getElementById('sap-status-sel').value;p.sapQuien=document.getElementById('sap-quien').value;}
-  document.getElementById('modal-sap').style.display='none';
-  renderAlmacen();renderRegistro();showToast('Registro SAP actualizado','ok');
-}
+window.toggleNota=toggleNota;
 
 // REGISTRO
 function renderRegistro(){
   const tbody=document.getElementById('reg-tbody');
-  if(!pedidos.length){tbody.innerHTML='<tr><td colspan="11" style="text-align:center;color:#94a3b8;padding:32px">Sin vales registrados aún</td></tr>';return;}
-  tbody.innerHTML=pedidos.map((p,i)=>`<tr>
-    <td>${i+1}</td>
-    <td><b>#${p.folio}</b></td>
+  const entries=Object.entries(window._pedidos).sort(([,a],[,b])=>b.createdAt-a.createdAt);
+  if(!entries.length){tbody.innerHTML='<tr><td colspan="11" style="text-align:center;color:#94a3b8;padding:32px">Sin vales registrados aún</td></tr>';return;}
+  tbody.innerHTML=entries.map(([,p],i)=>`<tr>
+    <td>${i+1}</td><td><b>#${p.folio}</b></td>
     <td style="white-space:nowrap">${p.fecha}</td>
-    <td>${p.solicitante}</td>
-    <td>${p.departamento}</td>
+    <td>${p.solicitante}</td><td>${p.departamento}</td>
     <td>${p.area||'—'}</td>
     <td><span class="tag tag-indigo">${p.tipoGasto}</span></td>
-    <td style="max-width:200px;font-size:12px">${p.items.map(it=>it.descripcion).join(', ')}</td>
+    <td style="max-width:200px;font-size:11px">${(p.items||[]).map(it=>it.descripcion).join(', ')}</td>
     <td><span class="badge ${STATUS[p.status].cls}" style="font-size:11px">${STATUS[p.status].icon} ${STATUS[p.status].label}</span></td>
     <td class="${p.sapStatus?'sap-ok':'sap-pending'}">${p.sapStatus||'Pendiente'}</td>
     <td>${p.sapQuien||'—'}</td>
@@ -595,106 +723,96 @@ function renderRegistro(){
 
 // EXCEL
 function exportExcel(){
-  const data=[['#','Folio','Fecha','Solicitante','Departamento','Área','Tipo Gasto','Artículos','Cantidad','Unidad','Estatus','Capturado SAP','Quién capturó']];
-  pedidos.forEach((p,i)=>{
-    if(p.items.length===0){data.push([i+1,p.folio,p.fecha,p.solicitante,p.departamento,p.area||'',p.tipoGasto,'','','',STATUS[p.status].label,p.sapStatus||'Pendiente',p.sapQuien||'']);}
-    p.items.forEach((it,j)=>{
+  const data=[['#','Folio','Fecha','Solicitante','Departamento','Área','Tipo','Artículo','Cantidad','Unidad','Estatus','Capturado SAP','Quién capturó']];
+  Object.values(window._pedidos).sort((a,b)=>b.createdAt-a.createdAt).forEach((p,i)=>{
+    (p.items||[]).forEach((it,j)=>{
       data.push([j===0?i+1:'',j===0?p.folio:'',j===0?p.fecha:'',j===0?p.solicitante:'',j===0?p.departamento:'',j===0?(p.area||''):'',j===0?p.tipoGasto:'',it.descripcion,it.cantidad,it.unidad,j===0?STATUS[p.status].label:'',j===0?(p.sapStatus||'Pendiente'):'',j===0?(p.sapQuien||''):'']);
     });
   });
   const ws=XLSX.utils.aoa_to_sheet(data);
-  ws['!cols']=[{wch:4},{wch:8},{wch:18},{wch:18},{wch:14},{wch:12},{wch:10},{wch:45},{wch:9},{wch:8},{wch:22},{wch:14},{wch:16}];
+  ws['!cols']=[{wch:4},{wch:12},{wch:18},{wch:18},{wch:14},{wch:12},{wch:8},{wch:45},{wch:9},{wch:8},{wch:22},{wch:14},{wch:16}];
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,'Vales Almacén');
   XLSX.writeFile(wb,'Vales_Almacen_Zubex_'+new Date().toISOString().slice(0,10)+'.xlsx');
   showToast('Excel descargado','ok');
 }
+window.exportExcel=exportExcel;
 
 // PDF
-function printPDF(folio){
-  const p=pedidos.find(x=>x.folio===folio);
-  if(!p) return;
-  const tipos={MCR:0,MPR:1,ME:2,SGE:3,OPE:4,NIN:5,MOD:6,PROY:7};
+function printPDF(key){
+  const p=window._pedidos[key];
+  if(!p)return;
   const allTipos=['MCR','MPR','ME','SGE','OPE','NIN','MOD','PROY'];
-  const rows=Array.from({length:Math.max(10,p.items.length)},(_,i)=>{
-    const it=p.items[i]||{codigo:'',descripcion:'',cantidad:'',unidad:''};
+  const rows=Array.from({length:Math.max(10,(p.items||[]).length)},(_,i)=>{
+    const it=(p.items||[])[i]||{codigo:'',descripcion:'',cantidad:'',unidad:''};
     return`<tr><td style="border:1px solid #1a3a8f;padding:3px 5px;font-size:11px">${it.codigo||''}</td><td style="border:1px solid #1a3a8f;padding:3px 5px;font-size:11px">${it.descripcion||''}</td><td style="border:1px solid #1a3a8f;padding:3px 5px;font-size:11px;text-align:center">${it.cantidad||''}</td><td style="border:1px solid #1a3a8f;padding:3px 5px;font-size:11px;text-align:center">${it.unidad||''}</td></tr>`;
   }).join('');
-  const tipoBoxes=allTipos.map(t=>`<span style="display:inline-block;border:1px solid #1a3a8f;padding:1px 4px;font-size:9px;margin:1px;background:${p.tipoGasto===t?'#1a3a8f':'transparent'};color:${p.tipoGasto===t?'#fff':'#1a3a8f'}">${t}</span>`).join('');
-  const win=window.open('','_blank','width=700,height=600');
+  const tipoBoxes=allTipos.map(t=>`<span style="display:inline-block;border:1px solid #1a3a8f;padding:1px 5px;font-size:9px;margin:1px;background:${p.tipoGasto===t?'#1a3a8f':'transparent'};color:${p.tipoGasto===t?'#fff':'#1a3a8f'}">${t}</span>`).join('');
+  const win=window.open('','_blank','width=720,height=650');
   win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Vale #${p.folio}</title>
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:Arial,sans-serif;padding:16px;width:680px;color:#1a3a8f}
-    @media print{body{padding:8px;width:100%}button{display:none!important}}
-  </style></head><body>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;padding:16px;width:680px;color:#1a3a8f}@media print{button{display:none!important}}</style>
+  </head><body>
   <div style="border:2px solid #1a3a8f;padding:14px">
-    <!-- HEADER -->
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
-      <div style="flex:1">
-        <div style="font-size:38px;font-weight:900;color:#1a3a8f;letter-spacing:-2px;line-height:1">zubex</div>
-        <div style="font-size:13px;font-weight:700;color:#1a3a8f;margin-top:4px;letter-spacing:1px">VALE DE SALIDA DE ALMACÉN</div>
-      </div>
+      <div><div style="font-size:38px;font-weight:900;color:#1a3a8f;letter-spacing:-2px;line-height:1">zubex</div>
+      <div style="font-size:13px;font-weight:700;color:#1a3a8f;margin-top:4px;letter-spacing:1px">VALE DE SALIDA DE ALMACÉN</div></div>
       <div style="text-align:right;font-size:9px;color:#1a3a8f;border:1px solid #1a3a8f;padding:6px;min-width:160px;background:#e8eef8">
         <div style="font-weight:700;margin-bottom:2px">Sistema de Gestión de Inocuidad y Calidad</div>
-        <div>Formato: Vale De Salida De Almacen</div>
-        <div>Fecha de Revisión: 17 de octubre 2023</div>
-        <div>Clave: ALM-F-31</div>
-        <div>Revisión: 6</div>
-        <div style="margin-top:4px;font-size:8px">Página 1 de 1</div>
+        <div>Formato: Vale De Salida De Almacen</div><div>Fecha de Revisión: 17 de octubre 2023</div>
+        <div>Clave: ALM-F-31</div><div>Revisión: 6</div><div style="margin-top:4px;font-size:8px">Página 1 de 1</div>
       </div>
     </div>
-    <!-- FOLIO -->
     <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
-      <div style="text-align:right">
-        <span style="font-size:13px;font-weight:700">Folio: N<sup>o</sup> </span>
-        <span style="font-size:22px;font-weight:900;color:#cc2020">${p.folio}</span>
-      </div>
+      <span style="font-size:13px;font-weight:700">Folio: N<sup>o</sup> </span>
+      <span style="font-size:22px;font-weight:900;color:#cc2020;margin-left:4px">${p.folio}</span>
     </div>
-    <!-- META ROW -->
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px;font-size:11px">
-      <div><span style="font-weight:700">Solicita: </span>${p.solicitante}</div>
-      <div><span style="font-weight:700">Departamento: </span>${p.departamento}</div>
-      <div><span style="font-weight:700">Área: </span>${p.area||'___________'}</div>
-      <div><span style="font-weight:700">Fecha: </span>${p.fecha.split(',')[0]}</div>
+      <div><b>Solicita: </b>${p.solicitante}</div><div><b>Departamento: </b>${p.departamento}</div>
+      <div><b>Área: </b>${p.area||'___'}</div><div><b>Fecha: </b>${p.fecha.split(',')[0]}</div>
     </div>
-    <div style="margin-bottom:8px;font-size:11px"><span style="font-weight:700">Línea: </span>${p.linea||'___________'}</div>
-    <!-- TIPO GASTO -->
-    <div style="margin-bottom:8px;font-size:10px">
-      <span style="font-weight:700;margin-right:4px">TIPO DE GASTO:</span>${tipoBoxes}
-    </div>
-    <!-- TABLE -->
+    <div style="margin-bottom:8px;font-size:11px"><b>Línea: </b>${p.linea||'___________'}</div>
+    <div style="margin-bottom:8px;font-size:10px"><b>TIPO DE GASTO: </b>${tipoBoxes}</div>
     <table style="width:100%;border-collapse:collapse;margin-bottom:14px">
       <thead><tr style="background:#1a3a8f;color:#fff">
         <th style="border:1px solid #1a3a8f;padding:4px 6px;font-size:11px;text-align:left;width:120px">Código</th>
         <th style="border:1px solid #1a3a8f;padding:4px 6px;font-size:11px;text-align:left">Descripción</th>
         <th style="border:1px solid #1a3a8f;padding:4px 6px;font-size:11px;text-align:center;width:70px">Cantidad</th>
         <th style="border:1px solid #1a3a8f;padding:4px 6px;font-size:11px;text-align:center;width:70px">Unidad</th>
-      </tr></thead>
-      <tbody>${rows}</tbody>
+      </tr></thead><tbody>${rows}</tbody>
     </table>
-    <!-- FIRMAS -->
     <div style="display:flex;justify-content:space-between;margin-top:20px">
-      <div style="text-align:center;width:200px">
-        <div style="border-top:1px solid #1a3a8f;margin-top:30px;padding-top:4px;font-size:11px">Firma de Recibido</div>
-      </div>
-      <div style="text-align:center;width:200px">
-        <div style="border-top:1px solid #1a3a8f;margin-top:30px;padding-top:4px;font-size:11px">Almacenista</div>
-      </div>
+      <div style="text-align:center;width:200px"><div style="border-top:1px solid #1a3a8f;margin-top:30px;padding-top:4px;font-size:11px">Firma de Recibido</div></div>
+      <div style="text-align:center;width:200px"><div style="border-top:1px solid #1a3a8f;margin-top:30px;padding-top:4px;font-size:11px">Almacenista</div></div>
     </div>
   </div>
   <div style="text-align:center;margin-top:12px">
-    <button onclick="window.print();window.close()" style="padding:10px 28px;background:#0D2B55;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-family:Arial">🖨️ Imprimir / Guardar PDF</button>
-  </div>
-  </body></html>`);
+    <button onclick="window.print();window.close()" style="padding:10px 28px;background:#0D2B55;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer">🖨️ Imprimir / Guardar PDF</button>
+  </div></body></html>`);
   win.document.close();
 }
+window.printPDF=printPDF;
+
+// NOTIFICACIONES IN-APP
+function showInAppNotif(title, body){
+  const b=document.getElementById('notif-banner');
+  document.getElementById('notif-title').textContent=title;
+  document.getElementById('notif-body').textContent=body;
+  b.style.display='block';
+  setTimeout(()=>b.style.display='none',5000);
+}
+function showBrowserNotif(title, body){
+  if(Notification.permission==='granted'){
+    new Notification(title,{body,icon:'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg'});
+  }
+}
+window.showInAppNotif=showInAppNotif;
 
 function updateBadge(){
-  const n=pedidos.filter(p=>p.status==='recibido').length;
+  const n=Object.values(window._pedidos).filter(p=>p.status==='recibido').length;
   const b=document.getElementById('badge-pending');
   b.textContent=n;b.style.display=n>0?'':'none';
 }
+
 function showToast(msg,type){
   const t=document.getElementById('toast');
   t.textContent=(type==='ok'?'✓ ':'✕ ')+msg;
@@ -702,8 +820,9 @@ function showToast(msg,type){
   t.style.display='block';
   setTimeout(()=>t.style.display='none',3000);
 }
+window.showToast=showToast;
 
-addItemRow();renderPortal();
+addItemRow();
 </script>
 </body>
 </html>
